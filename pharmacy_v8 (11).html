@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบจัดการยา</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tahoma,'TH Sarabun New',Arial,sans-serif;font-size:14px;background:#f0f2f5;color:#1a1a18;min-height:100vh}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a56db 0%,#0e3d8a 100%);padding:16px}
+.login-card{background:#fff;border-radius:16px;padding:2rem;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-icon{text-align:center;font-size:44px;margin-bottom:10px}
+.login-title{font-size:22px;font-weight:bold;text-align:center;margin-bottom:4px;color:#1a56db}
+.login-sub{font-size:13px;color:#888;text-align:center;margin-bottom:20px}
+.fg{margin-bottom:12px}
+.fl{display:block;font-size:12px;color:#555;margin-bottom:4px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px}
+.fi{width:100%;padding:9px 11px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;font-family:inherit;color:#1a1a18;background:#fff;transition:border-color .2s}
+.fi:focus{outline:none;border-color:#1a56db;box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+textarea.fi{resize:vertical;min-height:60px}
+select.fi{cursor:pointer}
+.err{color:#991b1b;font-size:12px;min-height:16px;margin-bottom:6px}
+.btn{padding:8px 14px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#333;font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:hover{background:#f5f5f5;border-color:#bbb}
+.btn-blue{background:#1a56db;border-color:#1a56db;color:#fff}
+.btn-blue:hover{background:#1340b0}
+.btn-red{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+.btn-red:hover{background:#fee2e2}
+.btn-green{background:#f0fdf4;border-color:#86efac;color:#166534}
+.btn-green:hover{background:#dcfce7}
+.btn-orange{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px}
+.btn-full{width:100%}
+.navbar{background:#1a56db;padding:0 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:0;z-index:200;min-height:52px;box-shadow:0 2px 8px rgba(26,86,219,.3)}
+.nb-brand{font-size:16px;font-weight:bold;color:#fff;white-space:nowrap;padding:10px 0}
+.nb-nav{display:flex;gap:2px;flex:1;flex-wrap:wrap;padding:6px 0;min-width:0}
+.nb-btn{padding:6px 10px;border:none;border-radius:7px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s}
+.nb-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+.nb-btn.act{background:#fff;color:#1a56db;font-weight:bold}
+.nb-user{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.85);flex-shrink:0}
+.bx{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:bold;white-space:nowrap}
+.b-admin{background:#dbeafe;color:#1e40af}
+.b-pharm{background:#dcfce7;color:#166534}
+.b-view{background:#f1f0ee;color:#444}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-orange{background:#fef3c7;color:#92400e}
+.b-green{background:#dcfce7;color:#166534}
+.b-blue{background:#dbeafe;color:#1e40af}
+.b-gray{background:#f1f0ee;color:#555}
+.b-purple{background:#ede9fe;color:#5b21b6}
+.b-teal{background:#ccfbf1;color:#134e4a}
+.b-yellow{background:#fef9c3;color:#713f12}
+.main{padding:16px;flex:1;max-width:1400px;margin:0 auto;width:100%}
+.stitle{font-size:18px;font-weight:bold;margin-bottom:14px;color:#1a1a18;display:flex;align-items:center;gap:8px}
+.card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-title{font-size:14px;font-weight:bold;margin-bottom:12px;color:#1a1a18;display:flex;align-items:center;gap:6px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.flbl{font-size:12px;color:#888;font-weight:bold}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:900px){.dash-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.dash-grid{grid-template-columns:1fr 1fr}}
+.dc{border-radius:14px;padding:16px;color:#fff;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.dc::before{content:'';position:absolute;right:-14px;top:-14px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.12)}
+.dc-icon{font-size:26px;margin-bottom:6px;display:block}
+.dc-num{font-size:30px;font-weight:bold;line-height:1}
+.dc-lbl{font-size:11px;opacity:.85;margin-top:4px}
+.dc-sub{font-size:10px;opacity:.7;margin-top:4px}
+.dc-1{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.dc-2{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.dc-3{background:linear-gradient(135deg,#8b5cf6,#7c3aed)}
+.dc-4{background:linear-gradient(135deg,#06b6d4,#0891b2)}
+.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:600px){.mini-grid{grid-template-columns:1fr 1fr}}
+.mc{background:#fff;border-radius:10px;padding:12px;border-left:4px solid;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:10px}
+.mc-icon{font-size:20px}
+.mc-num{font-size:20px;font-weight:bold}
+.mc-lbl{font-size:11px;color:#888}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:400px}
+th{text-align:left;padding:9px 10px;border-bottom:2px solid #eee;color:#555;font-weight:bold;white-space:nowrap;background:#fafaf8;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+td{padding:8px 10px;border-bottom:1px solid #f2f2f0;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.ab{padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
+.ab-yellow{background:#fef9c3;color:#713f12;border:1px solid #fde047}
+.ab-blue{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd}
+.ab-green{background:#dcfce7;color:#14532d;border:1px solid #86efac}
+.ab-red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.ab-orange{background:#fff7ed;color:#9a3412;border:1px solid #fdba74}
+/* warn badge on duplicate name */
+.dup-warn{background:#fef9c3;color:#713f12;border:1px solid #fde047;border-radius:6px;padding:2px 7px;font-size:11px;display:inline-block;margin-left:4px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px;overflow-y:auto}
+.modal{background:#fff;border-radius:14px;padding:20px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);margin:auto}
+.modal-wide{max-width:820px}
+.mtitle{font-size:16px;font-weight:bold;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #f0f0ee;display:flex;align-items:center;gap:8px}
+.mfooter{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:1px solid #f0f0ee;flex-wrap:wrap}
+.grow2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:480px){.grow2{grid-template-columns:1fr}.grow3{grid-template-columns:1fr 1fr}}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.step-list{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.si{border:1.5px solid #e5e5e0;border-radius:8px;padding:10px 12px;transition:all .2s}
+.si.done{border-color:#86efac;background:#f0fdf4}
+.sh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sn{width:26px;height:26px;border-radius:50%;border:1.5px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0;background:#fff}
+.sn.done{background:#dcfce7;border-color:#86efac;color:#166534}
+.sfields{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.srow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.srow label{font-size:12px;color:#666;min-width:80px}
+.srow input{flex:1;min-width:100px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit}
+/* daily report preview */
+.report-section{border:1px solid #e5e5e0;border-radius:8px;margin-bottom:12px;overflow:hidden}
+.report-section-header{background:#f8f8f6;padding:10px 14px;font-weight:bold;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.report-section-header:hover{background:#f0f0ee}
+.report-section-body{padding:0;display:none}
+.report-section-body.open{display:block}
+.report-item{padding:8px 14px;border-top:1px solid #f0f0ee;font-size:13px;display:flex;gap:8px;align-items:center}
+.report-item:first-child{border-top:none}
+code{font-family:monospace;background:#f0f0ee;padding:2px 5px;border-radius:4px;font-size:12px}
+.tmpl{font-size:11px;color:#1a56db;cursor:pointer;text-decoration:underline;margin-left:4px}
+.notify-tag{display:inline-flex;align-items:center;gap:4px;background:#f0f0ee;border-radius:6px;padding:4px 10px;font-size:12px;margin:3px}
+.notify-del{cursor:pointer;color:#999;font-weight:bold;margin-left:4px}
+.notify-del:hover{color:#e00}
+.rpt-section{border:1px solid #e5e5e0;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.rpt-head{background:#f5f5f2;padding:10px 14px;font-weight:bold;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;user-select:none}
+.rpt-head:hover{background:#eeeee9}
+.rpt-head-done{background:#f0fdf4}.rpt-head-done:hover{background:#dcfce7}
+.rpt-head-pend{background:#fef9c3}.rpt-head-pend:hover{background:#fef08a}
+.rpt-body{display:none;border-top:1px solid #e5e5e0}
+.rpt-body.open{display:block}
+.rpt-row{padding:8px 14px;border-bottom:1px solid #f0f0ee;font-size:12px}
+.rpt-row:last-child{border-bottom:none}
+.rpt-id{font-family:monospace;background:#f0f0ee;padding:1px 5px;border-radius:4px;font-size:11px;margin-right:6px}
+.status-detail{font-size:11px;color:#555;background:#f8f8f6;border:1px solid #e5e5e0;border-radius:5px;padding:2px 6px;display:inline-block;margin-top:2px}
+.dup-warn{background:#fef9c3;color:#713f12;border:1px solid #fde047;border-radius:6px;padding:2px 7px;font-size:11px;display:inline-block;margin-left:4px}
+
+@media(max-width:768px){.main{padding:10px}.stitle{font-size:16px}table{font-size:12px}th,td{padding:6px 7px}.btn{padding:6px 10px;font-size:12px}.nb-btn{padding:5px 8px;font-size:11px}.hide-mobile{display:none!important}}
+@media(max-width:480px){.btn-sm{padding:4px 8px;font-size:11px}.card{padding:12px}.modal{padding:14px}}
+@media print{.navbar,.toolbar,.no-print{display:none!important}.main{padding:0;max-width:100%}.card{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid}body{background:#fff}.modal-bg{display:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===================== STEP DEFINITIONS ===================== */
+var BORROW=[
+  {num:1,label:'ติดต่อบริษัท/โรงพยาบาล',fields:[{id:'contact',label:'ชื่อบริษัท/รพ.'}]},
+  {num:2,label:'ทำหนังสือขอยืมยา',fields:[{id:'borrow_qty',label:'จำนวน',type:'number'},{id:'borrow_date',label:'วันที่',type:'date'}]},
+  {num:3,label:'ส่งหนังสือขอยืมยา',fields:[{id:'aw',label:'เลข อว.',ph:'----/----'},{id:'send_date',label:'เมื่อวันที่',type:'date'}]},
+  {num:4,label:'ได้รับยาและรับเข้าแล้ว',fields:[]},
+  {num:5,label:'ทำหนังสือขอคืนยา',fields:[]},
+  {num:6,label:'ส่งหนังสือคืนยา',fields:[{id:'ret_aw',label:'เลข อว.',ph:'----/----'},{id:'receiver',label:'ผู้รับคืน'},{id:'position',label:'ตำแหน่ง'},{id:'ret_date',label:'วันที่',type:'date'}]},
+];
+var EXCHANGE=[
+  {num:1,label:'ติดต่อบริษัท/โรงพยาบาล',fields:[{id:'contact',label:'ชื่อบริษัท/รพ.'}]},
+  {num:2,label:'ทำหนังสือขอแลกเปลี่ยน',fields:[{id:'ex_date',label:'วันที่',type:'date'}]},
+  {num:3,label:'ส่งหนังสือขอแลกเปลี่ยน',fields:[{id:'aw',label:'เลข อว.',ph:'----/----'},{id:'send_date',label:'เมื่อวันที่',type:'date'}]},
+  {num:4,label:'แลกเปลี่ยนเรียบร้อย ยังไม่ได้รับเข้า',fields:[]},
+  {num:5,label:'รับเข้าแล้ว',fields:[]},
+];
+var EXP_ACTIONS=[
+  {id:'notify_doctor',label:'แจ้งแพทย์',color:'b-blue'},
+  {id:'notify_org',label:'แจ้งองค์กรแพทย์',color:'b-blue'},
+  {id:'notify_dept',label:'แจ้งภาควิชา',color:'b-blue'},
+  {id:'exchange_hospital',label:'แลกเปลี่ยนกับโรงพยาบาล',color:'b-teal'},
+  {id:'exchange_company',label:'แลกเปลี่ยนกับบริษัท',color:'b-teal'},
+  {id:'transfer_destroy',label:'โอนรอทำลาย',color:'b-red'},
+  {id:'borrow',label:'ยืมยา',color:'b-purple'},
+  {id:'other',label:'อื่นๆ',color:'b-gray'},
+];
+var ACT_LBL={order01:'จัดทำใบ 01',order02:'จัดทำใบ 02',order03:'จัดทำใบ 03',po:'PO',special:'ซื้อเฉพาะราย',nobuy:'ไม่ซื้อแล้ว',borrow:'ยืมยา',other:'อื่นๆ'};
+var ST_LBL={reorder:'ถึง Reorder Point',min:'ถึงระดับ Min',empty:'ยาหมดคลัง'};
+var ROLE_LBL={admin:'ผู้ดูแลระบบ',pharmacist:'เภสัชกร',viewer:'ผู้ดูอย่างเดียว'};
+var ROLE_BADGE={admin:'b-admin',pharmacist:'b-pharm',viewer:'b-view'};
+var RECV_REASONS=['กำลังทำใบ 01','กำลังทำใบ 02','กำลังทำ PO','ยังไม่ถึงเวลาที่สามารถรับเข้า','อื่นๆ'];
+var DAYS_TH=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+
+function levDist(a,b){var m=a.length,n=b.length;if(!m||!n)return m||n;if(m>25||n>25)return Math.abs(m-n)>3?99:3;var dp=[];for(var i=0;i<=m;i++){dp[i]=[i];for(var j=1;j<=n;j++)dp[i][j]=0;}for(var j=0;j<=n;j++)dp[0][j]=j;for(var i=1;i<=m;i++)for(var j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
+function getDups(){var all=[];S.RD.forEach(function(d){all.push({id:d.id,name:d.name.toLowerCase().trim(),display:d.name});});S.ED.forEach(function(d){all.push({id:d.id,name:d.name.toLowerCase().trim(),display:d.name});});S.XD.forEach(function(d){all.push({id:d.id,name:d.name.toLowerCase().trim(),display:d.name});});var pairs=[],seen={};for(var i=0;i<all.length;i++){for(var j=i+1;j<all.length;j++){if(all[i].id===all[j].id)continue;var key=[all[i].id,all[j].id].sort().join('|');if(seen[key])continue;var exact=all[i].name===all[j].name;var sim=!exact&&levDist(all[i].name,all[j].name)<=2;if(exact||sim){seen[key]=1;pairs.push({idA:all[i].id,idB:all[j].id,nameA:all[i].display,nameB:all[j].display,exact:exact});}}}return pairs;}
+function getDupIds(){var p=getDups(),ids={};p.forEach(function(pair){ids[pair.idA]=ids[pair.idA]||[];ids[pair.idA].push(pair.idB);ids[pair.idB]=ids[pair.idB]||[];ids[pair.idB].push(pair.idA);});return ids;}
+function actDetailText(drug){if(!drug.action)return '';var t=ACT_LBL[drug.action]||drug.action;if(drug.action==='borrow'&&drug.borrowStep>0){var step=BORROW[drug.borrowStep-1];t+=' — ขั้นตอน '+drug.borrowStep+'/'+BORROW.length+': '+(step?step.label:'');}if(drug.reason)t+=' ('+drug.reason+')';return t;}
+function expActDetailText(act){var t=eal(act.actId);var hasSteps=act.actId==='exchange_hospital'||act.actId==='exchange_company'||act.actId==='borrow';if(hasSteps&&act.exchangeStep>0){var def=act.actId==='borrow'?BORROW:EXCHANGE;var step=def[act.exchangeStep-1];t+=' — ขั้นตอน '+act.exchangeStep+'/'+(def.length)+': '+(step?step.label:'');}if(act.responsible)t+=' | '+act.responsible;if(act.actionDate)t+=' | '+act.actionDate;return t;}
+function buildReport(){var dow=new Date().getDay();var isMonday=dow===1;var sections=[];
+var rdDone=S.RD.filter(function(x){return !!x.action;});var rdPend=S.RD.filter(function(x){return !x.action;});
+if(isMonday){if(rdDone.length)sections.push({key:'rd-done',title:'&#9888; Reorder/Min/หมดคลัง — ดำเนินการแล้ว ('+rdDone.length+')',cls:'rpt-head-done',items:rdDone.map(function(d){return {id:d.id,name:d.name,detail:actDetailText(d)};})});if(rdPend.length)sections.push({key:'rd-pend',title:'&#9888; Reorder/Min/หมดคลัง — ยังไม่ดำเนินการ ('+rdPend.length+')',cls:'rpt-head-pend',items:rdPend.map(function(d){return {id:d.id,name:d.name,detail:ST_LBL[d.status]+' | คงเหลือ '+d.qty};})});}
+else{if(rdPend.length)sections.push({key:'rd-pend',title:'&#9888; Reorder/Min/หมดคลัง — ยังไม่ดำเนินการ ('+rdPend.length+')',cls:'rpt-head-pend',items:rdPend.map(function(d){return {id:d.id,name:d.name,detail:ST_LBL[d.status]+' | คงเหลือ '+d.qty};})});}
+var edDone=S.ED.filter(function(x){return x.actions.length>0;});var edPend=S.ED.filter(function(x){return x.actions.length===0;});
+if(isMonday){if(edDone.length)sections.push({key:'ed-done',title:'&#9203; ยาใกล้หมดอายุ — ดำเนินการแล้ว ('+edDone.length+')',cls:'rpt-head-done',items:edDone.map(function(d){return {id:d.id,name:d.name,detail:'หมดอายุ '+d.expDate+' | '+d.actions.map(function(a){return expActDetailText(a);}).join('; ')};})});if(edPend.length)sections.push({key:'ed-pend',title:'&#9203; ยาใกล้หมดอายุ — ยังไม่ดำเนินการ ('+edPend.length+')',cls:'rpt-head-pend',items:edPend.map(function(d){return {id:d.id,name:d.name,detail:'หมดอายุ '+d.expDate};})});}
+else{if(edPend.length)sections.push({key:'ed-pend',title:'&#9203; ยาใกล้หมดอายุ — ยังไม่ดำเนินการ ('+edPend.length+')',cls:'rpt-head-pend',items:edPend.map(function(d){return {id:d.id,name:d.name,detail:'หมดอายุ '+d.expDate};})});}
+var xdDone=S.XD.filter(function(x){return x.actions.length>0;});var xdPend=S.XD.filter(function(x){return x.actions.length===0;});
+if(isMonday){if(xdDone.length)sections.push({key:'xd-done',title:'&#128230; Dead Stock — ดำเนินการแล้ว ('+xdDone.length+')',cls:'rpt-head-done',items:xdDone.map(function(d){return {id:d.id,name:d.name,detail:'หมดอายุ '+d.expDate+' | '+d.actions.map(function(a){return expActDetailText(a);}).join('; ')};})});if(xdPend.length)sections.push({key:'xd-pend',title:'&#128230; Dead Stock — ยังไม่ดำเนินการ ('+xdPend.length+')',cls:'rpt-head-pend',items:xdPend.map(function(d){return {id:d.id,name:d.name,detail:'หมดอายุ '+d.expDate};})});}
+else{if(xdPend.length)sections.push({key:'xd-pend',title:'&#128230; Dead Stock — ยังไม่ดำเนินการ ('+xdPend.length+')',cls:'rpt-head-pend',items:xdPend.map(function(d){return {id:d.id,name:d.name,detail:'หมดอายุ '+d.expDate};})});}
+var rvPend=S.RECV.filter(function(x){return x.received!==true;});
+if(rvPend.length)sections.push({key:'rv-pend',title:'&#128666; ยารับเข้า — ยังไม่รับเข้า/รอดำเนินการ ('+rvPend.length+')',cls:'rpt-head-pend',items:rvPend.map(function(r){return {id:r.drugId||'-',name:r.drugName,detail:'วันที่ '+r.arrivalDate+' | Lot '+r.lot+' | จำนวน '+r.qty+(r.received===false?' | เหตุผล: '+r.notReceivedReason+(r.notReceivedOther?' ('+r.notReceivedOther+')':''):'')};})});
+return sections;}
+function buildReportHTML(startOpen){var sections=buildReport();if(!sections.length)return '<div class="ab ab-green">&#10003; ไม่มีรายการที่ต้องรายงาน</div>';var dow=new Date().getDay();var isMonday=dow===1;var note='วัน'+DAYS_TH[dow]+' — '+(isMonday?'รายงานทั้งหมด (แยกดำเนินการแล้ว/ยังไม่)':'รายงานเฉพาะที่ยังไม่ดำเนินการ');return '<div class="ab ab-blue" style="font-size:12px;margin-bottom:10px">'+note+'</div>'+sections.map(function(sec,idx){var bodyOpen=(startOpen||idx===0)?' open':'';var items=sec.items.length?sec.items.map(function(item){return '<div class="rpt-row"><span class="rpt-id">'+item.id+'</span><b>'+item.name+'</b>'+(item.detail?'<br><span style="color:#666;font-size:11px;padding-left:4px">'+item.detail+'</span>':'')+'</div>';}).join(''):'<div class="rpt-row" style="color:#aaa">ไม่มีรายการ</div>';return '<div class="rpt-section"><div class="rpt-head '+(sec.cls||'')+'" data-toggle-rpt="'+sec.key+(startOpen?'s':'p')+'"><span>'+sec.title+'</span><span class="rptarrow">'+(bodyOpen?'&#9650;':'&#9660;')+'</span></div><div class="rpt-body'+bodyOpen+'" id="rsb-'+sec.key+(startOpen?'s':'p')+'">'+items+'</div></div>';}).join('');}
+
+function eal(id){for(var i=0;i<EXP_ACTIONS.length;i++){if(EXP_ACTIONS[i].id===id)return EXP_ACTIONS[i].label;}return id;}
+function eac(id){for(var i=0;i<EXP_ACTIONS.length;i++){if(EXP_ACTIONS[i].id===id)return EXP_ACTIONS[i].color;}return 'b-gray';}
+function uid(){return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function makeDrug(o){return Object.assign({action:null,reason:'',borrowStep:0,stepData:{},actions:[],max:0,reorder:0,min:0,status:'reorder',qty:0,expDate:''},o);}
+function makeAction(actId){return {id:uid(),actId:actId,responsible:'',actionDate:'',note:'',exchangeStep:0,stepData:{}};}
+function makeRecv(o){return Object.assign({id:uid(),arrivalDate:'',drugId:'',drugName:'',lot:'',qty:0,received:null,notReceivedReason:'',notReceivedOther:''},o||{});}
+
+/* ===================== STATE ===================== */
+var S={
+  user:null,tab:'dashboard',
+  users:[
+    {id:'u1',username:'admin',password:'admin123',role:'admin',name:'ผู้ดูแลระบบ',email:''},
+  ],
+  notifyEmails:[],notifyLines:[],
+  drugLevels:{},
+  /* Google Apps Script Web App URLs — แยกต่อแต่ละส่วน */
+  /* URL เดียวกันทุกส่วน เพราะใช้ Sheet เดียวกัน แค่ต่างแค่ ?sheet=xxx */
+  gasUrls:{
+    reorder:'https://script.google.com/macros/s/AKfycbwBNmzei4SfXfDetcW1H9p2_a4-5Mk9vBJZ91jkcgNJaoiAloBpxdk8U8z9P1bMMm9m9w/exec',
+    levels:'https://script.google.com/macros/s/AKfycbwBNmzei4SfXfDetcW1H9p2_a4-5Mk9vBJZ91jkcgNJaoiAloBpxdk8U8z9P1bMMm9m9w/exec',
+    nearexp:'https://script.google.com/macros/s/AKfycbwBNmzei4SfXfDetcW1H9p2_a4-5Mk9vBJZ91jkcgNJaoiAloBpxdk8U8z9P1bMMm9m9w/exec',
+    deadstock:'https://script.google.com/macros/s/AKfycbwBNmzei4SfXfDetcW1H9p2_a4-5Mk9vBJZ91jkcgNJaoiAloBpxdk8U8z9P1bMMm9m9w/exec',
+    receive:'https://script.google.com/macros/s/AKfycbwBNmzei4SfXfDetcW1H9p2_a4-5Mk9vBJZ91jkcgNJaoiAloBpxdk8U8z9P1bMMm9m9w/exec'
+  },
+  RD:[],
+  ED:[],
+  XD:[],
+  RECV:[],
+  rf:'all',rf2:'all',ef:'all',xf:'all',recvf:'all',recvf2:'all',
+  modal:null,md:{}
+};
+
+/* ─── Drug name duplicate detection ─── */
+function getDupWarnings(){
+  /* collect all drugs across all lists */
+  var all=[];
+  S.RD.forEach(function(d){all.push({id:d.id,name:d.name.toLowerCase().trim()});});
+  S.ED.forEach(function(d){all.push({id:d.id,name:d.name.toLowerCase().trim()});});
+  S.XD.forEach(function(d){all.push({id:d.id,name:d.name.toLowerCase().trim()});});
+  S.RECV.forEach(function(r){if(r.drugName) all.push({id:r.drugId||('rv:'+r.id),name:r.drugName.toLowerCase().trim()});});
+  /* find names that appear with different IDs — using simple similarity check */
+  var warnings={}; /* id -> message */
+  for(var i=0;i<all.length;i++){
+    for(var j=i+1;j<all.length;j++){
+      if(all[i].id!==all[j].id && nameSimilar(all[i].name,all[j].name) && all[i].name!==all[j].name){
+        warnings[all[i].id]=(warnings[all[i].id]||[]);
+        if(warnings[all[i].id].indexOf(all[j].id)===-1) warnings[all[i].id].push(all[j].id);
+        warnings[all[j].id]=(warnings[all[j].id]||[]);
+        if(warnings[all[j].id].indexOf(all[i].id)===-1) warnings[all[j].id].push(all[i].id);
+      }
+      /* exact same name but different IDs */
+      if(all[i].id!==all[j].id && all[i].name===all[j].name){
+        var key='exact:'+all[i].name;
+        warnings[all[i].id]=(warnings[all[i].id]||[]); if(warnings[all[i].id].indexOf(all[j].id)===-1) warnings[all[i].id].push(all[j].id);
+        warnings[all[j].id]=(warnings[all[j].id]||[]); if(warnings[all[j].id].indexOf(all[i].id)===-1) warnings[all[j].id].push(all[i].id);
+      }
+    }
+  }
+  return warnings;
+}
+function nameSimilar(a,b){
+  /* Levenshtein distance <= 2 for strings longer than 6 chars */
+  if(Math.abs(a.length-b.length)>3) return false;
+  var d=levDist(a,b);
+  return d>0 && d<=2;
+}
+function levDist(a,b){
+  var m=a.length,n=b.length;
+  if(m===0||n===0) return m||n;
+  if(m>30||n>30) return Math.abs(m-n)>2?99:levDist(a.slice(0,15),b.slice(0,15)); /* cap for performance */
+  var dp=[];
+  for(var i=0;i<=m;i++){dp[i]=[i];for(var j=1;j<=n;j++){dp[i][j]=0;}}
+  for(var j=0;j<=n;j++) dp[0][j]=j;
+  for(var i=1;i<=m;i++){for(var j=1;j<=n;j++){dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);}}
+  return dp[m][n];
+}
+
+/* ─── Build daily report data ─── */
+function buildReport(){
+  var sections=[];
+  var r1=S.RD.filter(function(x){return !x.action;});
+  var r2=S.ED.filter(function(x){return x.actions.length===0;});
+  var r3=S.XD.filter(function(x){return x.actions.length===0;});
+  var r4=S.RECV.filter(function(x){return x.received===null;});
+  if(r1.length) sections.push({key:'reorder',title:'&#9888; Reorder / Min / ยาหมดคลัง ที่ยังไม่ดำเนินการ ('+r1.length+' รายการ)',items:r1.map(function(d){return {id:d.id,name:d.name,note:ST_LBL[d.status]+' | คงเหลือ '+d.qty};})});
+  if(r2.length) sections.push({key:'nearexp',title:'&#9203; ยาใกล้หมดอายุ ที่ยังไม่ดำเนินการ ('+r2.length+' รายการ)',items:r2.map(function(d){return {id:d.id,name:d.name,note:'หมดอายุ '+d.expDate};})});
+  if(r3.length) sections.push({key:'deadstock',title:'&#128230; Dead Stock ที่ยังไม่ดำเนินการ ('+r3.length+' รายการ)',items:r3.map(function(d){return {id:d.id,name:d.name,note:'หมดอายุ '+d.expDate};})});
+  if(r4.length) sections.push({key:'recv',title:'&#128666; ยารับเข้า รอดำเนินการ ('+r4.length+' รายการ)',items:r4.map(function(r){return {id:r.drugId||'-',name:r.drugName,note:'วันที่ '+r.arrivalDate+' | Lot '+r.lot};})});
+  return sections;
+}
+
+/* ===================== RENDER ===================== */
+function render(){
+  var app=document.getElementById('app');
+  if(!S.user){app.innerHTML=loginH();bindLogin();return;}
+  app.innerHTML=navH()+'<div class="main">'+mainH()+'</div>'+(S.modal?modalH():'');
+  bindNav();bindMain();
+  if(S.modal) bindModal();
+}
+
+/* ── LOGIN ── */
+function loginH(){
+  return '<div class="login-wrap"><div class="login-card">'+
+    '<div class="login-icon">&#128138;</div>'+
+    '<div class="login-title">ระบบจัดการยา</div>'+
+    '<div class="login-sub">Hospital Pharmacy Management</div>'+
+    '<div class="fg"><label class="fl">Username</label><input class="fi" id="fu" type="text" autocomplete="username"></div>'+
+    '<div class="fg"><label class="fl">Password</label><input class="fi" id="fp" type="password" autocomplete="current-password"></div>'+
+    '<div id="ferr" class="err"></div>'+
+    '<button class="btn btn-blue btn-full" id="fbtn" style="padding:12px;font-size:15px;justify-content:center">&#128274; เข้าสู่ระบบ</button>'+
+  '</div></div>';
+}
+function bindLogin(){
+  function go(){
+    var u=document.getElementById('fu').value.trim(),p=document.getElementById('fp').value.trim(),f=null;
+    for(var i=0;i<S.users.length;i++){if(S.users[i].username===u&&S.users[i].password===p){f=S.users[i];break;}}
+    if(f){S.user=f;S.tab='dashboard';render();}
+    else document.getElementById('ferr').textContent='ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+  }
+  document.getElementById('fbtn').onclick=go;
+  document.getElementById('fp').onkeydown=function(e){if(e.key==='Enter')go();};
+  document.getElementById('fu').onkeydown=function(e){if(e.key==='Enter')document.getElementById('fp').focus();};
+}
+
+/* ── NAVBAR ── */
+function navH(){
+  var tabs=[{id:'dashboard',label:'&#127968; ภาพรวม'},{id:'reorder',label:'&#9888; Reorder'},{id:'nearexp',label:'&#9203; ใกล้หมดอายุ'},{id:'deadstock',label:'&#128230; Dead Stock'},{id:'receive',label:'&#128666; รับเข้า'}];
+  if(S.user.role==='admin') tabs.push({id:'users',label:'&#128100; ผู้ใช้'});
+  tabs.push({id:'settings',label:'&#9881; ตั้งค่า'});
+  return '<nav class="navbar">'+
+    '<div class="nb-brand">&#128138; MedStock</div>'+
+    '<div class="nb-nav">'+tabs.map(function(t){return '<button class="nb-btn'+(S.tab===t.id?' act':'')+'" data-tab="'+t.id+'">'+t.label+'</button>';}).join('')+'</div>'+
+    '<div class="nb-user"><span class="hide-mobile">'+S.user.name+'</span><span class="bx '+ROLE_BADGE[S.user.role]+'">'+ROLE_LBL[S.user.role]+'</span><button class="btn btn-sm no-print" id="bout" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)">ออก</button></div>'+
+  '</nav>';
+}
+function bindNav(){
+  document.getElementById('bout').onclick=function(){S.user=null;render();};
+  document.querySelectorAll('[data-tab]').forEach(function(b){b.onclick=function(){S.tab=b.dataset.tab;render();};});
+}
+
+function mainH(){
+  if(S.tab==='dashboard') return dashH();
+  if(S.tab==='reorder')   return reorderH();
+  if(S.tab==='nearexp')   return expH(S.ED,'nearexp',S.ef);
+  if(S.tab==='deadstock') return expH(S.XD,'deadstock',S.xf);
+  if(S.tab==='receive')   return receiveH();
+  if(S.tab==='users')     return usersH();
+  if(S.tab==='settings')  return settingsH();
+  return '';
+}
+
+function bindMain(){
+  document.querySelectorAll('[data-rf]').forEach(function(b){b.onclick=function(){S.rf=b.dataset.rf;render();};});
+  document.querySelectorAll('[data-rf2]').forEach(function(b){b.onclick=function(){S.rf2=b.dataset.rf2;render();};});
+  document.querySelectorAll('[data-rvf2]').forEach(function(b){b.onclick=function(){S.recvf2=b.dataset.rvf2;render();};});
+  document.querySelectorAll('[data-toggle-rpt]').forEach(function(b){b.onclick=function(){var body=document.getElementById('rsb-'+b.dataset.toggleRpt);if(body){body.classList.toggle('open');var a=b.querySelector('.rptarrow');if(a)a.innerHTML=body.classList.contains('open')?'&#9650;':'&#9660;';}};});
+  document.querySelectorAll('[data-ef2]').forEach(function(b){b.onclick=function(){if(b.dataset.lt==='nearexp') S.ef=b.dataset.ef2; else S.xf=b.dataset.ef2;render();};});
+  document.querySelectorAll('[data-rvf]').forEach(function(b){b.onclick=function(){S.recvf=b.dataset.rvf;render();};});
+  xb('exp-r',function(){doExportCSV(S.RD,'reorder.csv');});
+  xb('exp-e',function(){doExportCSV(S.ED,'nearexp.csv');});
+  xb('exp-x',function(){doExportCSV(S.XD,'deadstock.csv');});
+  xb('exp-recv',function(){doExportCSV(S.RECV,'receive.csv');});
+  document.querySelectorAll('[data-epdf]').forEach(function(b){b.onclick=function(){doPDF(b.dataset.epdf);};});
+  fc('fi-r',function(e){handleCSV(e,'reorder');});
+  fc('fi-lv',function(e){handleCSV(e,'levels');});
+  fc('fi-e',function(e){handleCSV(e,'nearexp');});
+  fc('fi-x',function(e){handleCSV(e,'deadstock');});
+  fc('fi-recv',function(e){handleCSV(e,'receive');});
+  document.querySelectorAll('[data-tmpl]').forEach(function(b){b.onclick=function(){downloadTemplate(b.dataset.tmpl);};});
+  document.querySelectorAll('[data-opr]').forEach(function(b){b.onclick=function(){S.modal='reorder-act';S.md={id:b.dataset.opr};render();};});
+  document.querySelectorAll('[data-edit-drug]').forEach(function(b){b.onclick=function(){
+    var lt=b.dataset.lt,list=lt==='reorder'?S.RD:lt==='nearexp'?S.ED:S.XD;
+    var d=findById(list,b.dataset.did);if(!d)return;
+    S.modal='edit-drug';S.md={lt:lt,drug:JSON.parse(JSON.stringify(d))};render();
+  };});
+  document.querySelectorAll('[data-ope]').forEach(function(b){b.onclick=function(){S.modal='exp-act';S.md={id:b.dataset.ope,lt:b.dataset.lt};render();};});
+  document.querySelectorAll('[data-vst]').forEach(function(b){b.onclick=function(){S.modal='steps';S.md={id:b.dataset.vst,lt:b.dataset.lt,aid:b.dataset.aid};render();};});
+  document.querySelectorAll('[data-delr]').forEach(function(b){b.onclick=function(){if(confirm('ยืนยันการลบ?')){S.RD=S.RD.filter(function(x){return x.id!==b.dataset.delr;});render();}};});
+  document.querySelectorAll('[data-dele]').forEach(function(b){b.onclick=function(){if(confirm('ยืนยันการลบ?')){if(b.dataset.lt==='nearexp') S.ED=S.ED.filter(function(x){return x.id!==b.dataset.dele;});else S.XD=S.XD.filter(function(x){return x.id!==b.dataset.dele;});render();}};});
+  document.querySelectorAll('[data-del-act]').forEach(function(b){b.onclick=function(){
+    var list=b.dataset.lt==='nearexp'?S.ED:S.XD;
+    for(var i=0;i<list.length;i++){if(list[i].id===b.dataset.did){list[i].actions=list[i].actions.filter(function(a){return a.id!==b.dataset.aid;});break;}}
+    render();
+  };});
+  xb('btn-add-recv',function(){S.modal='add-recv';S.md={received:null};render();});
+  document.querySelectorAll('[data-edit-recv]').forEach(function(b){b.onclick=function(){var rv=S.RECV.find(function(x){return x.id===b.dataset.editRecv;});if(rv){S.modal='edit-recv';S.md=JSON.parse(JSON.stringify(rv));render();}};});
+  document.querySelectorAll('[data-del-recv]').forEach(function(b){b.onclick=function(){if(confirm('ยืนยันการลบ?')){S.RECV=S.RECV.filter(function(x){return x.id!==b.dataset.delRecv;});render();}};});
+  xb('btn-add-user',function(){S.modal='add-user';S.md={};render();});
+  document.querySelectorAll('[data-del-user]').forEach(function(b){b.onclick=function(){if(b.dataset.delUser===S.user.id){alert('ไม่สามารถลบตัวเองได้');return;}if(confirm('ยืนยันการลบ?')){S.users=S.users.filter(function(u){return u.id!==b.dataset.delUser;});render();}};});
+  document.querySelectorAll('[data-edit-user]').forEach(function(b){b.onclick=function(){var u=S.users.find(function(x){return x.id===b.dataset.editUser;});if(u){S.modal='edit-user';S.md={uid:u.id,name:u.name,username:u.username,role:u.role,email:u.email||''};render();}};});
+  xb('btn-add-email',function(){var v=document.getElementById('inp-email');if(!v||!v.value.trim())return;var e=v.value.trim();if(S.notifyEmails.indexOf(e)===-1){S.notifyEmails.push(e);v.value='';render();}});
+  document.querySelectorAll('[data-del-email]').forEach(function(b){b.onclick=function(){S.notifyEmails=S.notifyEmails.filter(function(e){return e!==b.dataset.delEmail;});render();};});
+  xb('btn-add-line',function(){var v=document.getElementById('inp-line');if(!v||!v.value.trim())return;var t=v.value.trim();if(S.notifyLines.indexOf(t)===-1){S.notifyLines.push(t);v.value='';render();}});
+  document.querySelectorAll('[data-del-line]').forEach(function(b){b.onclick=function(){S.notifyLines=S.notifyLines.filter(function(l){return l!==b.dataset.delLine;});render();};});
+  xb('btn-clear-nearexp',function(){
+    if(S.ED.length===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('ยืนยันการลบข้อมูลยาใกล้หมดอายุ ทั้งหมด '+S.ED.length+' รายการ?\n\nไม่สามารถกู้คืนได้')){S.ED=[];render();}
+  });
+  xb('btn-clear-deadstock',function(){
+    if(S.XD.length===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('ยืนยันการลบข้อมูล Dead Stock ทั้งหมด '+S.XD.length+' รายการ?\n\nไม่สามารถกู้คืนได้')){S.XD=[];render();}
+  });
+  /* Google Apps Script sync buttons */
+  document.querySelectorAll('[data-gasread]').forEach(function(b){b.onclick=function(){gasRead(b.dataset.gasread,null);};});
+  document.querySelectorAll('[data-gasexport]').forEach(function(b){b.onclick=function(){gasExport(b.dataset.gasexport);};});
+  /* Settings: test connection */
+  document.querySelectorAll('[data-gas-test]').forEach(function(b){b.onclick=function(){
+    var key=b.dataset.gasTest;
+    /* save URL first if user typed but didn't click save */
+    var el=document.getElementById('gasurl-'+key);
+    if(el&&el.value.trim()) S.gasUrls[key]=el.value.trim();
+    gasTest(key);
+  };});
+  /* Settings: save Web App URL */
+  document.querySelectorAll('[data-gas-save]').forEach(function(b){b.onclick=function(){
+    var key=b.dataset.gasSave;
+    var el=document.getElementById('gasurl-'+key);
+    if(el){S.gasUrls[key]=(el.value||'').trim();alert('บันทึก URL สำหรับ '+key+' แล้ว');}
+    render();
+  };});
+  /* Show/hide Apps Script code */
+  xb('btn-show-gas-code',function(){
+    var block=document.getElementById('gas-code-block');
+    var btn=document.getElementById('btn-show-gas-code');
+    if(block){
+      var show=block.style.display==='none';
+      block.style.display=show?'block':'none';
+      if(btn) btn.textContent=show?'&#128196; ซ่อน Code':'&#128196; ดู Apps Script Code';
+    }
+  });
+  xb('btn-copy-gas',function(){
+    var ta=document.getElementById('gas-code-text');
+    if(ta){ta.select();document.execCommand('copy');alert('คัดลอก Code แล้ว!');}
+  });
+  xb('btn-preview-report',function(){S.modal='report-preview';S.md={};render();});
+  /* clear section buttons (admin) */
+  xb('btn-clear-rd',function(){
+    if(S.RD.length===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('ยืนยันการลบข้อมูล Reorder/Min/หมดคลัง ทั้งหมด '+S.RD.length+' รายการ?\n\nการดำเนินการนี้ไม่สามารถกู้คืนได้')){S.RD=[];render();}
+  });
+  xb('btn-clear-ed',function(){
+    if(S.ED.length===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('ยืนยันการลบข้อมูลยาใกล้หมดอายุ ทั้งหมด '+S.ED.length+' รายการ?\n\nการดำเนินการนี้ไม่สามารถกู้คืนได้')){S.ED=[];render();}
+  });
+  xb('btn-clear-xd',function(){
+    if(S.XD.length===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('ยืนยันการลบข้อมูล Dead Stock ทั้งหมด '+S.XD.length+' รายการ?\n\nการดำเนินการนี้ไม่สามารถกู้คืนได้')){S.XD=[];render();}
+  });
+  xb('btn-clear-recv',function(){
+    if(S.RECV.length===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('ยืนยันการลบข้อมูลยารับเข้า ทั้งหมด '+S.RECV.length+' รายการ?\n\nการดำเนินการนี้ไม่สามารถกู้คืนได้')){S.RECV=[];render();}
+  });
+  xb('btn-clear-levels',function(){
+    var n=Object.keys(S.drugLevels).length;
+    if(n===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('ยืนยันการลบข้อมูล Drug Levels ทั้งหมด '+n+' รายการ?\n\nการดำเนินการนี้ไม่สามารถกู้คืนได้')){S.drugLevels={};render();}
+  });
+  xb('btn-clear-all',function(){
+    var total=S.RD.length+S.ED.length+S.XD.length+S.RECV.length+Object.keys(S.drugLevels).length;
+    if(total===0){alert('ไม่มีข้อมูลให้ลบ');return;}
+    if(confirm('⚠️ ยืนยันการลบข้อมูลยาทั้งหมดทุกส่วน?\n\nReorder/Min/หมดคลัง: '+S.RD.length+' รายการ\nยาใกล้หมดอายุ: '+S.ED.length+' รายการ\nDead Stock: '+S.XD.length+' รายการ\nยารับเข้า: '+S.RECV.length+' รายการ\nDrug Levels: '+Object.keys(S.drugLevels).length+' รายการ\n\nรวม '+total+' รายการ — ไม่สามารถกู้คืนได้')){
+      if(confirm('กดยืนยันอีกครั้งเพื่อยืนยันการลบข้อมูลทั้งหมด')){
+        S.RD=[];S.ED=[];S.XD=[];S.RECV=[];S.drugLevels={};render();
+      }
+    }
+  });
+  /* report section toggles */
+  document.querySelectorAll('[data-toggle-section]').forEach(function(b){b.onclick=function(){
+    var body=document.getElementById('rsb-'+b.dataset.toggleSection);
+    if(body){body.classList.toggle('open');b.querySelector('.rsc-arrow').textContent=body.classList.contains('open')?'&#9650;':'&#9660;';}
+  };});
+}
+function xb(id,fn){var el=document.getElementById(id);if(el)el.onclick=fn;}
+function fc(id,fn){var el=document.getElementById(id);if(el)el.onchange=fn;}
+
+/* ==================== DASHBOARD ==================== */
+function dashH(){
+  var dups=getDups(),dupIds=getDupIds();
+  var dow=new Date().getDay();
+  var today='วัน'+DAYS_TH[dow]+' '+new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  var nr=S.RD.filter(function(x){return !x.action;}).length;
+  var ne=S.ED.filter(function(x){return x.actions.length===0;}).length;
+  var nx=S.XD.filter(function(x){return x.actions.length===0;}).length;
+  var nrv=S.RECV.filter(function(x){return x.received===null;}).length;
+  var total=nr+ne+nx;
+  var pendRows=[];
+  S.RD.filter(function(x){return !x.action;}).forEach(function(x){pendRows.push('<tr><td><code>'+x.id+'</code></td><td>'+x.name+'</td><td>Reorder/Min</td><td style="font-size:11px;color:#888">'+ST_LBL[x.status]+'</td><td><span class="bx b-orange">รอ</span></td></tr>');});
+  S.ED.filter(function(x){return x.actions.length===0;}).forEach(function(x){pendRows.push('<tr><td><code>'+x.id+'</code></td><td>'+x.name+'</td><td>ใกล้หมดอายุ</td><td style="font-size:11px;color:#888">'+x.expDate+'</td><td><span class="bx b-red">รอ</span></td></tr>');});
+  S.XD.filter(function(x){return x.actions.length===0;}).forEach(function(x){pendRows.push('<tr><td><code>'+x.id+'</code></td><td>'+x.name+'</td><td>Dead Stock</td><td style="font-size:11px;color:#888">'+x.expDate+'</td><td><span class="bx b-gray">รอ</span></td></tr>');});
+  var doneRows=[];
+  S.RD.filter(function(x){return !!x.action;}).forEach(function(x){doneRows.push('<tr><td><code>'+x.id+'</code></td><td>'+x.name+'</td><td>Reorder/Min</td><td style="font-size:11px;color:#444">'+actDetailText(x)+'</td></tr>');});
+  S.ED.filter(function(x){return x.actions.length>0;}).forEach(function(x){doneRows.push('<tr><td><code>'+x.id+'</code></td><td>'+x.name+'</td><td>ใกล้หมดอายุ</td><td style="font-size:11px;color:#444">'+x.actions.map(function(a){return expActDetailText(a);}).join(' | ')+'</td></tr>');});
+  S.XD.filter(function(x){return x.actions.length>0;}).forEach(function(x){doneRows.push('<tr><td><code>'+x.id+'</code></td><td>'+x.name+'</td><td>Dead Stock</td><td style="font-size:11px;color:#444">'+x.actions.map(function(a){return expActDetailText(a);}).join(' | ')+'</td></tr>');});
+  return '<div class="stitle">&#127968; ภาพรวม <span style="font-size:13px;font-weight:normal;color:#888">'+today+'</span></div>'+
+  '<div class="no-print" style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-epdf="dashboard">&#128438; Export PDF</button><button class="btn btn-blue" id="btn-preview-report">&#128276; ดูตัวอย่าง Daily Report</button></div>'+
+  (dups.length?'<div class="ab ab-orange" style="display:block">&#9888; <b>พบชื่อยาที่คล้ายกันหรือเหมือนกัน แต่รหัสต่างกัน '+dups.length+' คู่</b> — อาจพิมพ์ผิดหรือบันทึกซ้ำ กรุณาตรวจสอบ'+
+    '<table style="margin-top:10px;width:100%;font-size:12px;border-collapse:collapse">'+
+      '<thead><tr>'+
+        '<th style="text-align:left;padding:5px 8px;background:#f59e0b22;border-bottom:1px solid #f59e0b44;width:5%">#</th>'+
+        '<th style="text-align:left;padding:5px 8px;background:#f59e0b22;border-bottom:1px solid #f59e0b44;width:12%">รหัสยา 1</th>'+
+        '<th style="text-align:left;padding:5px 8px;background:#f59e0b22;border-bottom:1px solid #f59e0b44;width:33%">ชื่อยา 1</th>'+
+        '<th style="text-align:center;padding:5px 8px;background:#f59e0b22;border-bottom:1px solid #f59e0b44;width:5%"></th>'+
+        '<th style="text-align:left;padding:5px 8px;background:#f59e0b22;border-bottom:1px solid #f59e0b44;width:12%">รหัสยา 2</th>'+
+        '<th style="text-align:left;padding:5px 8px;background:#f59e0b22;border-bottom:1px solid #f59e0b44;width:33%">ชื่อยา 2</th>'+
+      '</tr></thead><tbody>'+
+      dups.map(function(p,i){
+        return '<tr style="border-bottom:1px solid #f59e0b33">'+
+          '<td style="padding:5px 8px;color:#92400e;font-weight:bold">'+(i+1)+'</td>'+
+          '<td style="padding:5px 8px"><code style="background:#fef3c7;color:#92400e">'+p.idA+'</code></td>'+
+          '<td style="padding:5px 8px;font-weight:bold">'+p.nameA+'</td>'+
+          '<td style="padding:5px 8px;text-align:center;color:#92400e">&#8596;</td>'+
+          '<td style="padding:5px 8px"><code style="background:#fef3c7;color:#92400e">'+p.idB+'</code></td>'+
+          '<td style="padding:5px 8px;font-weight:bold">'+p.nameB+' <span class="bx b-yellow" style="font-size:10px">'+(p.exact?'ชื่อเหมือนกัน':'ชื่อคล้ายกัน')+'</span></td>'+
+        '</tr>';
+      }).join('')+
+    '</tbody></table></div>':'')+
+  '<div class="dash-grid">'+dc('dc-1','&#9888;',S.RD.length,'Reorder/Min/หมดคลัง','ยังไม่ดำเนินการ '+nr)+dc('dc-2','&#9203;',S.ED.length,'ยาใกล้หมดอายุ','ยังไม่ดำเนินการ '+ne)+dc('dc-3','&#128230;',S.XD.length,'Dead Stock','ยังไม่ดำเนินการ '+nx)+dc('dc-4','&#128666;',S.RECV.length,'ยารับเข้า','รอดำเนินการ '+nrv)+'</div>'+
+  '<div class="mini-grid">'+mc('#f59e0b','&#128204;',S.RD.filter(function(x){return x.status==="empty";}).length,'ยาหมดคลัง','#92400e')+mc('#ef4444','&#128205;',S.RD.filter(function(x){return x.status==="min";}).length,'ถึงระดับ Min','#991b1b')+mc('#10b981','&#128504;',S.RECV.filter(function(x){return x.received===true;}).length,'รับเข้าแล้ว','#065f46')+'</div>'+
+  (total>0?'<div class="ab ab-yellow">&#9888; ยังไม่ดำเนินการ <b>'+total+' รายการ</b>'+(S.notifyEmails.length||S.notifyLines.length?' — จะส่ง Daily Report: <b>'+S.notifyEmails.length+' email</b>, <b>'+S.notifyLines.length+' LINE</b>':'<span style="color:#c00"> — ยังไม่ตั้งค่าช่องทางแจ้งเตือน</span>')+'</div>':'<div class="ab ab-green">&#10003; ยาทุกรายการได้รับการดำเนินการแล้ว</div>')+
+  '<div class="card"><div class="card-title">&#128203; รายการรอดำเนินการ</div><div class="tw"><table><thead><tr><th>รหัสยา</th><th>ชื่อยา</th><th>ประเภท</th><th>หมายเหตุ</th><th>สถานะ</th></tr></thead><tbody>'+(pendRows.length?pendRows.join(''):'<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px">ไม่มีรายการรอดำเนินการ</td></tr>')+'</tbody></table></div></div>'+
+  '<div class="card"><div class="card-title">&#10003; ดำเนินการแล้ว — รายละเอียด</div><div class="tw"><table><thead><tr><th>รหัสยา</th><th>ชื่อยา</th><th>ประเภท</th><th>รายละเอียดการดำเนินการ</th></tr></thead><tbody>'+(doneRows.length?doneRows.join(''):'<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">ยังไม่มีรายการที่ดำเนินการแล้ว</td></tr>')+'</tbody></table></div></div>'+
+  (Object.keys(S.drugLevels).length?'<div class="card"><div class="card-title">&#128200; Drug Levels</div><div class="tw"><table><thead><tr><th>รหัสยา</th><th>ชื่อยา</th><th style="text-align:right">Max</th><th style="text-align:right">Reorder</th><th style="text-align:right">Min</th></tr></thead><tbody>'+Object.keys(S.drugLevels).map(function(k){var lv=S.drugLevels[k];return '<tr><td><code>'+k+'</code></td><td>'+(lv.name||'-')+'</td><td style="text-align:right">'+lv.max+'</td><td style="text-align:right">'+lv.reorder+'</td><td style="text-align:right">'+lv.min+'</td></tr>';}).join('')+'</tbody></table></div></div>':'');
+}
+function dc(cls,icon,num,lbl,sub){return '<div class="dc '+cls+'"><span class="dc-icon">'+icon+'</span><div class="dc-num">'+num+'</div><div class="dc-lbl">'+lbl+'</div><div class="dc-sub">'+sub+'</div></div>';}
+function mc(color,icon,num,lbl,tc){return '<div class="mc" style="border-color:'+color+'"><span class="mc-icon">'+icon+'</span><div><div class="mc-num" style="color:'+tc+'">'+num+'</div><div class="mc-lbl">'+lbl+'</div></div></div>';}
+/* ==================== REORDER ==================== */
+function reorderH(){
+  var can=S.user.role!=='viewer',isAdmin=S.user.role==='admin';
+  var dupIds=getDupIds();
+  var f=S.rf,f2=S.rf2;
+  var drugs=f==='all'?S.RD:S.RD.filter(function(d){return d.status===f;});
+  if(f2==='pending') drugs=drugs.filter(function(d){return !d.action;});
+  else if(f2==='done') drugs=drugs.filter(function(d){return !!d.action;});
+  else if(f2==='borrow_all') drugs=drugs.filter(function(d){return d.action==='borrow';});
+  else if(f2==='borrow_s1') drugs=drugs.filter(function(d){return d.action==='borrow'&&d.borrowStep===0;});
+  else if(f2==='borrow_s2') drugs=drugs.filter(function(d){return d.action==='borrow'&&d.borrowStep===1;});
+  else if(f2==='borrow_s3') drugs=drugs.filter(function(d){return d.action==='borrow'&&d.borrowStep===2;});
+  else if(f2==='borrow_s4') drugs=drugs.filter(function(d){return d.action==='borrow'&&d.borrowStep>=3;});
+  else if(f2==='order01') drugs=drugs.filter(function(d){return d.action==='order01';});
+  else if(f2==='po') drugs=drugs.filter(function(d){return d.action==='po';});
+  else if(f2==='nobuy') drugs=drugs.filter(function(d){return d.action==='nobuy';});
+  var cnt={all:S.RD.length,reorder:S.RD.filter(function(x){return x.status==='reorder';}).length,min:S.RD.filter(function(x){return x.status==='min';}).length,empty:S.RD.filter(function(x){return x.status==='empty';}).length};
+  var f2opts=[{v:'all',l:'ทั้งหมด'},{v:'pending',l:'รอดำเนินการ'},{v:'done',l:'ดำเนินการแล้ว'},{v:'order01',l:'จัดทำใบ 01'},{v:'po',l:'PO'},{v:'nobuy',l:'ไม่ซื้อแล้ว'},{v:'borrow_all',l:'ยืมยา'},{v:'borrow_s1',l:'ยืม: รอติดต่อ'},{v:'borrow_s2',l:'ยืม: ติดต่อแล้ว'},{v:'borrow_s3',l:'ยืม: ทำหนังสือแล้ว'},{v:'borrow_s4',l:'ยืม: ส่งหนังสือ+'}];
+  var rows=drugs.map(function(d){
+    var sc=d.status==='empty'?'b-red':d.status==='min'?'b-orange':'b-blue';
+    var qc=d.qty===0?'#991b1b':d.qty<=d.min?'#92400e':d.qty<=d.reorder?'#1e40af':'#166534';
+    var warn=dupIds[d.id]?'<span class="dup-warn">&#9888; ตรวจสอบรหัส</span>':'';
+    var actCell=d.action?
+      '<span class="bx b-green">'+ACT_LBL[d.action]+'</span>'+
+      (d.action==='borrow'&&d.borrowStep>0?'<br><span class="status-detail">ขั้นตอน '+d.borrowStep+'/'+BORROW.length+': '+(BORROW[d.borrowStep-1]?BORROW[d.borrowStep-1].label:'')+'</span>':'')+
+      (d.reason?'<br><span class="status-detail">เหตุผล: '+d.reason+'</span>':'')+
+      (can?' <button class="btn btn-xs no-print" data-opr="'+d.id+'">&#9998;</button>':'')
+      :(can?'<button class="btn btn-sm no-print" data-opr="'+d.id+'">เลือก</button>':'<span class="bx b-gray">รอ</span>');
+    return '<tr><td><code>'+d.id+'</code></td><td>'+d.name+warn+'</td>'+
+      '<td style="text-align:right;font-weight:bold;color:'+qc+'">'+d.qty.toLocaleString()+'</td>'+
+      '<td style="text-align:right;color:#888" class="hide-mobile">'+d.max.toLocaleString()+'</td>'+
+      '<td style="text-align:right;color:#888" class="hide-mobile">'+d.reorder.toLocaleString()+'</td>'+
+      '<td style="text-align:right;color:#888" class="hide-mobile">'+d.min.toLocaleString()+'</td>'+
+      '<td style="text-align:right;font-weight:bold;color:#92400e;background:#fef9c3" class="hide-mobile">'+Math.max(0,d.max-d.min).toLocaleString()+'</td>'+
+      '<td><span class="bx '+sc+'">'+ST_LBL[d.status]+'</span></td>'+
+      '<td>'+actCell+'</td>'+
+      (isAdmin?'<td class="no-print"><button class="btn btn-xs" data-edit-drug="1" data-lt="reorder" data-did="'+d.id+'">&#9998;</button> <button class="btn btn-xs btn-red" data-delr="'+d.id+'">&#128465;</button></td>':'')+
+    '</tr>';
+  }).join('');
+  return '<div class="stitle">&#9888; Reorder / Min / ยาหมดคลัง</div>'+
+  '<div class="toolbar no-print">'+
+  (can?'<button class="btn btn-green" data-gasread="reorder">&#128196; ดึงข้อมูลจาก Sheet'+(S.gasUrls.reorder?' <span style="font-size:10px;opacity:.7">'+S.gasUrls.reorder.slice(39,60)+'...</span>':'')+'</button>'+
+       '<button class="btn btn-green" data-gasread="levels">&#128200; ดึง Drug Levels'+(S.gasUrls.levels?' <span style="font-size:10px;opacity:.7">ตั้งค่าแล้ว</span>':'')+'</button>':'')+
+  (isAdmin?'<button class="btn" data-gasexport="reorder">&#9650; ส่งข้อมูลไป Sheet</button>':'')+
+  '<span style="display:none" id="gsync-status-reorder"></span>'+
+  '<button class="btn" id="exp-r">&#128196; Export CSV</button><button class="btn" data-epdf="reorder">&#128438; PDF</button>'+(isAdmin?'<button class="btn btn-red" id="btn-clear-rd">&#128465; ลบทั้งหมด</button>':'')+'</div>'+
+  '<div class="toolbar no-print"><span class="flbl">สต๊อก:</span>'+['all','reorder','min','empty'].map(function(v){return '<button class="btn btn-sm'+(f===v?' btn-blue':'')+'" data-rf="'+v+'">'+(v==='all'?'ทั้งหมด':ST_LBL[v])+' ('+cnt[v]+')</button>';}).join('')+'</div>'+
+  '<div class="toolbar no-print"><span class="flbl">การดำเนินการ:</span><div style="display:flex;gap:4px;flex-wrap:wrap">'+f2opts.map(function(o){return '<button class="btn btn-sm'+(f2===o.v?' btn-blue':'')+'" data-rf2="'+o.v+'">'+o.l+'</button>';}).join('')+'</div></div>'+
+  '<div class="card"><div class="tw"><table><thead><tr><th>รหัสยา</th><th>ชื่อยา</th><th style="text-align:right">คงเหลือ</th><th style="text-align:right" class="hide-mobile">Max</th><th style="text-align:right" class="hide-mobile">Reorder</th><th style="text-align:right" class="hide-mobile">Min</th><th style="text-align:right;background:#fef9c3;color:#92400e" class="hide-mobile">ปริมาณที่ต้องซื้อ<br><span style="font-weight:normal;font-size:10px">(Max - Min)</span></th><th>สถานะ</th><th>การดำเนินการ</th>'+(isAdmin?'<th class="no-print"></th>':'')+'</tr></thead><tbody>'+(rows||'<tr><td colspan="10" style="text-align:center;color:#aaa;padding:16px">ไม่มีรายการ</td></tr>')+'</tbody></table></div></div>';
+}
+/* ==================== EXP / DEAD STOCK ==================== */
+function expH(drugs,lt,f){
+  var can=S.user.role!=='viewer',isAdmin=S.user.role==='admin';
+  var dup=getDupWarnings();
+  var title=lt==='nearexp'?'&#9203; ยาใกล้หมดอายุ':'&#128230; Dead Stock';
+  var expId=lt==='nearexp'?'exp-e':'exp-x',fileId=lt==='nearexp'?'fi-e':'fi-x';
+  var today=new Date();today.setHours(0,0,0,0);
+  var opts=['all','none'].concat(EXP_ACTIONS.map(function(a){return a.id;}));
+  var filtered=f==='all'?drugs:f==='none'?drugs.filter(function(d){return d.actions.length===0;}):drugs.filter(function(d){return d.actions.some(function(a){return a.actId===f;});});
+  var rows=filtered.map(function(d){
+    var ec='#166534',dl='';
+    if(d.expDate){var ed=new Date(d.expDate);ed.setHours(0,0,0,0);var dv=Math.ceil((ed-today)/(1000*86400));ec=dv<=0?'#991b1b':dv<=30?'#991b1b':dv<=90?'#92400e':'#166534';dl='<br><small style="color:'+ec+'">'+(dv<=0?'หมดอายุแล้ว':'อีก '+dv+' วัน')+'</small>';}
+    var warn=dup[d.id]&&dup[d.id].length>0?'<span class="dup-warn">&#9888; อาจพิมพ์ผิด</span>':'';
+    var actSum=d.actions.length?d.actions.map(function(a){
+      var hs=a.actId==='exchange_hospital'||a.actId==='exchange_company'||a.actId==='borrow';
+      var tot=a.actId==='borrow'?BORROW.length:EXCHANGE.length;
+      return '<div style="margin-bottom:3px"><span class="bx '+eac(a.actId)+'">'+eal(a.actId)+'</span>'+(a.responsible?' <small>'+a.responsible+'</small>':'')+(hs?' <button class="btn btn-xs no-print" data-vst="'+d.id+'" data-lt="'+lt+'" data-aid="'+a.id+'">ขั้นตอน '+a.exchangeStep+'/'+tot+'</button>':'')+(isAdmin?' <button class="btn btn-xs btn-red no-print" data-del-act="1" data-lt="'+lt+'" data-did="'+d.id+'" data-aid="'+a.id+'">x</button>':'')+'</div>';
+    }).join(''):'<span class="bx b-gray">รอดำเนินการ</span>';
+    return '<tr><td><code>'+d.id+'</code></td><td>'+d.name+warn+'</td><td style="text-align:right;font-weight:bold">'+d.qty.toLocaleString()+'</td><td><span style="color:'+ec+';font-weight:bold">'+(d.expDate||'-')+'</span>'+dl+'</td><td>'+actSum+'</td><td class="no-print">'+(can?'<button class="btn btn-xs btn-blue" data-ope="'+d.id+'" data-lt="'+lt+'">+</button> ':'')+( isAdmin?'<button class="btn btn-xs" data-edit-drug="1" data-lt="'+lt+'" data-did="'+d.id+'">&#9998;</button> <button class="btn btn-xs btn-red" data-dele="'+d.id+'" data-lt="'+lt+'">&#128465;</button>':'')+'</td></tr>';
+  }).join('');
+  return '<div class="stitle">'+title+'</div>'+
+  '<div class="toolbar no-print">'+
+  (can?'<button class="btn btn-green" data-gasread="'+lt+'">&#128196; ดึงข้อมูลจาก Sheet'+(S.gasUrls[lt]?' <span style="font-size:10px;opacity:.7">ตั้งค่าแล้ว</span>':'')+'</button>':'')+
+  (isAdmin?'<button class="btn" data-gasexport="'+lt+'">&#9650; ส่งข้อมูลไป Sheet</button>':'')+
+  '<span style="display:none" id="gsync-status-'+lt+'"></span>'+
+  '<button class="btn" id="'+expId+'">&#128196; Export CSV</button><button class="btn" data-epdf="'+lt+'">&#128438; PDF</button>'+(isAdmin?'<button class="btn btn-red" id="btn-clear-'+lt+'">&#128465; ลบทั้งหมด</button>':'')+'</div>'+
+  '<div class="toolbar no-print" style="flex-wrap:wrap"><span class="flbl">กรอง:</span><div style="display:flex;gap:4px;flex-wrap:wrap">'+opts.map(function(v){return '<button class="btn btn-sm'+(f===v?' btn-blue':'')+'" data-ef2="'+v+'" data-lt="'+lt+'">'+(v==='all'?'ทั้งหมด':v==='none'?'รอดำเนินการ':eal(v))+'</button>';}).join('')+'</div></div>'+
+  '<div class="card"><div class="tw"><table><thead><tr><th>รหัสยา</th><th>ชื่อยา</th><th style="text-align:right">คงเหลือ</th><th>วันหมดอายุ</th><th>การดำเนินการ</th><th class="no-print"></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
+
+/* ==================== RECEIVE ==================== */
+function receiveH(){
+  var isAdmin=S.user.role==='admin',can=S.user.role!=='viewer';
+  var dupIds=getDupIds();
+  var f=S.recvf,f2=S.recvf2;
+  var filtered=f==='all'?S.RECV:f==='received'?S.RECV.filter(function(r){return r.received===true;}):f==='notreceived'?S.RECV.filter(function(r){return r.received===false;}):S.RECV.filter(function(r){return r.received===null;});
+  if(f2==='po') filtered=filtered.filter(function(r){return r.notReceivedReason==='กำลังทำ PO';});
+  else if(f2==='01') filtered=filtered.filter(function(r){return r.notReceivedReason==='กำลังทำใบ 01';});
+  else if(f2==='02') filtered=filtered.filter(function(r){return r.notReceivedReason==='กำลังทำใบ 02';});
+  else if(f2==='time') filtered=filtered.filter(function(r){return r.notReceivedReason==='ยังไม่ถึงเวลาที่สามารถรับเข้า';});
+  else if(f2==='other') filtered=filtered.filter(function(r){return r.notReceivedReason==='อื่นๆ';});
+  else if(f2==='no_reason') filtered=filtered.filter(function(r){return r.received===null;});
+  var rows=filtered.map(function(rv){
+    var stBadge=rv.received===true?'<span class="bx b-green">&#10003; รับเข้าแล้ว</span>':
+      rv.received===false?'<span class="bx b-orange">&#9888; ยังไม่รับเข้า</span><br><span class="status-detail">'+rv.notReceivedReason+(rv.notReceivedOther?' ('+rv.notReceivedOther+')':'')+'</span>':
+      '<span class="bx b-gray">รอดำเนินการ</span>';
+    var warn=rv.drugId&&dupIds[rv.drugId]?'<span class="dup-warn">&#9888;</span>':'';
+    return '<tr><td>'+rv.arrivalDate+'</td><td><code>'+(rv.drugId||'-')+'</code></td><td>'+rv.drugName+warn+'</td><td>'+(rv.lot||'-')+'</td><td style="text-align:right;font-weight:bold">'+rv.qty.toLocaleString()+'</td><td>'+stBadge+'</td><td class="no-print">'+(can?'<button class="btn btn-xs" data-edit-recv="'+rv.id+'">&#9998;</button> ':'')+( isAdmin?'<button class="btn btn-xs btn-red" data-del-recv="'+rv.id+'">&#128465;</button>':'')+'</td></tr>';
+  }).join('');
+  var f2opts=[{v:'all',l:'ทั้งหมด'},{v:'no_reason',l:'รอดำเนินการ'},{v:'01',l:'กำลังทำใบ 01'},{v:'02',l:'กำลังทำใบ 02'},{v:'po',l:'กำลังทำ PO'},{v:'time',l:'ยังไม่ถึงเวลา'},{v:'other',l:'อื่นๆ'}];
+  return '<div class="stitle">&#128666; ยารับเข้า</div>'+
+  '<div class="toolbar no-print">'+(can?'<button class="btn btn-blue" id="btn-add-recv">+ เพิ่มรายการ</button>':'')+
+  (can?'<button class="btn btn-green" data-gasread="receive">&#128196; ดึงข้อมูลจาก Sheet'+(S.gasUrls.receive?' <span style="font-size:10px;opacity:.7">ตั้งค่าแล้ว</span>':'')+'</button>':'')+
+  (isAdmin?'<button class="btn" data-gasexport="receive">&#9650; ส่งข้อมูลไป Sheet</button>':'')+
+  '<span style="display:none" id="gsync-status-receive"></span>'+
+  '<button class="btn" id="exp-recv">&#128196; Export CSV</button><button class="btn" data-epdf="receive">&#128438; PDF</button>'+(isAdmin?'<button class="btn btn-red" id="btn-clear-recv">&#128465; ลบทั้งหมด</button>':'')+'</div>'+
+  '<div class="toolbar no-print"><span class="flbl">สถานะรับเข้า:</span>'+['all','received','notreceived','pending'].map(function(v){var l=v==='all'?'ทั้งหมด':v==='received'?'รับเข้าแล้ว':v==='notreceived'?'ยังไม่รับเข้า':'รอดำเนินการ';return '<button class="btn btn-sm'+(f===v?' btn-blue':'')+'" data-rvf="'+v+'">'+l+'</button>';}).join('')+'</div>'+
+  '<div class="toolbar no-print"><span class="flbl">เหตุผล:</span><div style="display:flex;gap:4px;flex-wrap:wrap">'+f2opts.map(function(o){return '<button class="btn btn-sm'+(f2===o.v?' btn-blue':'')+'" data-rvf2="'+o.v+'">'+o.l+'</button>';}).join('')+'</div></div>'+
+  '<div class="card"><div class="tw"><table><thead><tr><th>วันที่ยามาถึง</th><th>รหัสยา</th><th>ชื่อยา</th><th>Lot</th><th style="text-align:right">จำนวน</th><th>สถานะ</th><th class="no-print"></th></tr></thead><tbody>'+(rows||'<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px">ไม่มีรายการ</td></tr>')+'</tbody></table></div></div>';
+}
+/* ==================== USERS ==================== */
+function usersH(){
+  var rows=S.users.map(function(u){return '<tr><td>'+u.name+'</td><td><code>'+u.username+'</code></td><td class="hide-mobile">'+u.email+'</td><td><span class="bx '+ROLE_BADGE[u.role]+'">'+ROLE_LBL[u.role]+'</span></td><td><button class="btn btn-sm" data-edit-user="'+u.id+'">&#9998;</button> '+(u.id!==S.user.id?'<button class="btn btn-sm btn-red" data-del-user="'+u.id+'">&#128465;</button>':'')+'</td></tr>';}).join('');
+  return '<div class="stitle">&#128100; จัดการผู้ใช้</div><div class="toolbar"><button class="btn btn-blue" id="btn-add-user">+ เพิ่มผู้ใช้</button></div><div class="card"><div class="tw"><table><thead><tr><th>ชื่อ</th><th>Username</th><th class="hide-mobile">Email</th><th>สิทธิ์</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
+
+/* ==================== SETTINGS ==================== */
+function settingsH(){
+  var report=buildReport();
+  var etags=S.notifyEmails.map(function(e){return '<span class="notify-tag">&#128140; '+e+'<span class="notify-del" data-del-email="'+e+'">&#10005;</span></span>';}).join('');
+  var ltags=S.notifyLines.map(function(l){return '<span class="notify-tag" style="background:#dcfce7">&#128172; '+l.slice(0,14)+'...<span class="notify-del" data-del-line="'+l+'">&#10005;</span></span>';}).join('');
+  var gConnected=false; /* Apps Script — no OAuth needed */
+  var sheetTypes=[
+    {key:'reorder',label:'Reorder / Min / หมดคลัง',cols:'รหัสยา, ชื่อยา, จำนวน, status (max/reorder/min ดึงจาก Drug Levels อัตโนมัติ)'},
+    {key:'levels',label:'Drug Levels',cols:'รหัสยา, ชื่อยา, max, reorder_point, min'},
+    {key:'nearexp',label:'ยาใกล้หมดอายุ',cols:'รหัสยา, ชื่อยา, จำนวน, วันหมดอายุ'},
+    {key:'deadstock',label:'Dead Stock',cols:'รหัสยา, ชื่อยา, จำนวน, วันหมดอายุ'},
+    {key:'receive',label:'ยารับเข้า',cols:'วันที่ยามาถึง, ชื่อยา, lot, จำนวน'},
+  ];
+
+  /* Apps Script code to show in modal */
+  var gasCode='// ==== วาง code นี้ใน Google Apps Script (เวอร์ชัน GitHub Pages) ====\n'+
+'// เปิด Google Sheet → Extensions → Apps Script → ลบทั้งหมด → วาง → Save → Deploy\n\n'+
+'var SHEETS = {\n'+
+'  reorder:   \"Reorder\",\n'+
+'  levels:    \"DrugLevels\",\n'+
+'  nearexp:   \"NearExp\",\n'+
+'  deadstock: \"DeadStock\",\n'+
+'  receive:   \"Receive\"\n'+
+'};\n\n'+
+'// =========================================================\n'+
+'// สำคัญ: Deploy ต้องเลือก\n'+
+'//   Execute as: Me\n'+
+'//   Who has access: Anyone  <-- ต้องเป็น Anyone เท่านั้น\n'+
+'// =========================================================\n\n'+
+'function doGet(e) {\n'+
+'  var sheet = e.parameter.sheet || \"reorder\";\n'+
+'  var ss = SpreadsheetApp.getActiveSpreadsheet();\n'+
+'  var ws = ss.getSheetByName(SHEETS[sheet] || sheet);\n'+
+'  if (!ws) return out({error: \"ไม่พบ Sheet: \" + sheet});\n'+
+'  var data = ws.getDataRange().getValues();\n'+
+'  if (data.length < 2) return out({rows: []});\n'+
+'  var headers = data[0];\n'+
+'  var rows = data.slice(1).filter(function(r){\n'+
+'    return r.some(function(c){ return c !== \"\" && c !== null; });\n'+
+'  }).map(function(row) {\n'+
+'    var o = {};\n'+
+'    headers.forEach(function(h, i) {\n'+
+'      o[String(h).trim()] = row[i] !== undefined && row[i] !== null ? String(row[i]) : \"\";\n'+
+'    });\n'+
+'    return o;\n'+
+'  });\n'+
+'  return out({ok: true, rows: rows, count: rows.length});\n'+
+'}\n\n'+
+'function doPost(e) {\n'+
+'  try {\n'+
+'    var body = JSON.parse(e.postData.contents);\n'+
+'    var sheet = body.sheet || \"reorder\";\n'+
+'    var rows = body.rows || [];\n'+
+'    var ss = SpreadsheetApp.getActiveSpreadsheet();\n'+
+'    var ws = ss.getSheetByName(SHEETS[sheet] || sheet);\n'+
+'    if (!ws) ws = ss.insertSheet(SHEETS[sheet] || sheet);\n'+
+'    ws.clearContents();\n'+
+'    if (rows.length === 0) return out({ok: true, written: 0});\n'+
+'    var headers = Object.keys(rows[0]);\n'+
+'    ws.getRange(1, 1, 1, headers.length).setValues([headers]);\n'+
+'    var values = rows.map(function(r) {\n'+
+'      return headers.map(function(h) { return r[h] !== undefined ? r[h] : \"\"; });\n'+
+'    });\n'+
+'    ws.getRange(2, 1, values.length, headers.length).setValues(values);\n'+
+'    return out({ok: true, written: values.length});\n'+
+'  } catch(err) {\n'+
+'    return out({error: err.toString()});\n'+
+'  }\n'+
+'}\n\n'+
+'function out(obj) {\n'+
+'  return ContentService\n'+
+'    .createTextOutput(JSON.stringify(obj))\n'+
+'    .setMimeType(ContentService.MimeType.JSON);\n'+
+'}';
+
+  return '<div class="stitle">&#9881; ตั้งค่าระบบ</div>'+
+
+  /* Google Apps Script */
+  '<div class="card"><div class="card-title">&#128196; เชื่อมต่อ Google Sheets (ผ่าน Apps Script)</div>'+
+  '<div class="ab ab-blue" style="font-size:12px;margin-bottom:12px">'+
+    '<b>วิธีตั้งค่า (ทำครั้งเดียว ไม่ต้องสมัครอะไรเพิ่ม):</b><br>'+
+    '1. เปิด Google Sheet ที่ต้องการ → <b>Extensions → Apps Script</b><br>'+
+    '2. ลบ code เดิมทั้งหมด → วาง code จากปุ่มด้านล่าง → กด <b>Save (Ctrl+S)</b><br>'+
+    '3. กด <b>Deploy → New deployment</b> → Type: <b>Web app</b><br>'+
+    '&nbsp;&nbsp;&nbsp;Execute as: <b>Me</b> | Who has access: <b>Anyone</b> → <b>Deploy</b><br>'+
+    '4. Copy <b>Web App URL</b> ที่ได้ → วางในช่องด้านล่างแต่ละส่วน<br>'+
+    '5. ตั้งชื่อ Sheet Tab ให้ตรงกับ code (Reorder, DrugLevels, NearExp, DeadStock, Receive)'+
+  '</div>'+
+  '<button class="btn btn-blue" id="btn-show-gas-code">&#128196; ดู Apps Script Code</button>'+
+  '<div id="gas-code-block" style="display:none;margin-top:12px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+      '<span style="font-size:12px;font-weight:bold;color:#555">คัดลอก Code นี้ไปวางใน Apps Script</span>'+
+      '<button class="btn btn-sm btn-blue" id="btn-copy-gas">&#128203; Copy Code</button>'+
+    '</div>'+
+    '<textarea id="gas-code-text" class="fi" style="font-family:monospace;font-size:11px;height:300px;white-space:pre;color:#1a1a18;background:#f8f8f6">'+esc(gasCode)+'</textarea>'+
+  '</div>'+
+
+  '<hr style="border:none;border-top:1px solid #eee;margin:16px 0">'+
+  '<div style="font-weight:bold;font-size:13px;margin-bottom:10px">ตั้งค่า Web App URL แต่ละส่วน</div>'+
+  sheetTypes.map(function(st){
+    var u=S.gasUrls[st.key]||'';
+    var hasUrl=!!u;
+    var tabMap={reorder:'Reorder',levels:'DrugLevels',nearexp:'NearExp',deadstock:'DeadStock',receive:'Receive'};
+    return '<div style="border:1px solid #e5e5e0;border-radius:8px;padding:12px;margin-bottom:10px">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">'+
+        '<span style="font-weight:bold;font-size:13px">'+st.label+'</span>'+
+        '<span class="bx b-gray" style="font-size:10px">Tab: '+tabMap[st.key]+'</span>'+
+        '<span style="font-size:11px;color:#888">คอลัมน์: '+st.cols+'</span>'+
+      '</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        '<input class="fi" id="gasurl-'+st.key+'" type="url" placeholder="https://script.google.com/macros/s/.../exec" value="'+esc(u)+'" style="flex:1;min-width:180px;font-size:12px;font-family:monospace">'+
+        '<button class="btn btn-blue btn-sm" data-gas-save="'+st.key+'">&#128190; บันทึก</button>'+
+        (hasUrl?'<button class="btn btn-sm" style="border-color:#1a56db;color:#1a56db" data-gas-test="'+st.key+'">&#128281; ทดสอบเชื่อมต่อ</button>':'<button class="btn btn-sm" style="color:#aaa;cursor:not-allowed" disabled>&#128281; บันทึก URL ก่อน</button>')+
+      '</div>'+
+      '<div id="gsync-status-'+st.key+'" style="font-size:12px;margin-top:6px;padding:6px 8px;border-radius:6px;background:#f8f8f6;display:flex;align-items:center;gap:6px">'+
+        (hasUrl
+          ?'<span style="color:#888">&#9711; พร้อมเชื่อมต่อ — กด "ทดสอบ" เพื่อตรวจสอบ</span>'
+          :'<span style="color:#aaa">ยังไม่ได้ตั้งค่า URL</span>')+
+      '</div>'+
+    '</div>';
+  }).join('')+
+  '</div>'+
+
+  /* Email */
+  '<div class="card"><div class="card-title">&#128140; Email Daily Report</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><input class="fi" id="inp-email" type="email" placeholder="กรอก email" style="flex:1;min-width:200px"><button class="btn btn-blue" id="btn-add-email">เพิ่ม</button></div>'+
+    (etags?'<div>'+etags+'</div>':'<div style="font-size:12px;color:#aaa">ยังไม่มี email</div>')+
+  '</div>'+
+
+  /* LINE */
+  '<div class="card"><div class="card-title">&#128172; LINE Notify Token</div>'+
+    '<div class="ab ab-blue" style="font-size:12px;margin-bottom:10px">วิธีรับ Token: notify-bot.line.me → My Services → Generate token</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><input class="fi" id="inp-line" type="text" placeholder="LINE Notify Token" style="flex:1;min-width:200px"><button class="btn btn-blue" id="btn-add-line">เพิ่ม</button></div>'+
+    (ltags?'<div>'+ltags+'</div>':'<div style="font-size:12px;color:#aaa">ยังไม่มี LINE token</div>')+
+  '</div>'+
+
+  /* Report preview */
+  '<div class="card"><div class="card-title">&#128276; ตัวอย่าง Daily Report ที่จะส่ง</div>'+
+    (report.length===0?'<div class="ab ab-green">&#10003; ไม่มีรายการที่ต้องรายงาน</div>':
+      '<div class="ab ab-blue" style="font-size:12px">&#128274; ตัวอย่างนี้แสดงข้อมูล ณ ปัจจุบัน — กดหัวข้อเพื่อดูรายละเอียด</div>'+
+      report.map(function(sec){
+        var items=sec.items.map(function(item){return '<div class="report-item"><code>'+item.id+'</code><span>'+item.name+'</span><span style="font-size:11px;color:#888;margin-left:auto">'+item.note+'</span></div>';}).join('');
+        return '<div class="report-section">'+
+          '<div class="report-section-header" data-toggle-section="'+sec.key+'">'+
+            '<span>'+sec.title+'</span><span class="rsc-arrow">&#9660;</span>'+
+          '</div>'+
+          '<div class="report-section-body" id="rsb-'+sec.key+'">'+items+'</div>'+
+        '</div>';
+      }).join('')
+    )+
+  '</div>'+
+
+  /* Clear data */
+  (S.user&&S.user.role==='admin'?
+  '<div class="card" style="border-color:#fca5a5"><div class="card-title" style="color:#991b1b">&#128465; ลบข้อมูลทั้งส่วน (Admin เท่านั้น)</div>'+
+  '<div class="ab ab-red" style="font-size:12px;margin-bottom:12px">&#9888; การลบข้อมูลจะไม่สามารถกู้คืนได้ กรุณาตรวจสอบก่อนทุกครั้ง</div>'+
+  '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn btn-red" id="btn-clear-rd">&#128465; Reorder/Min/หมดคลัง ('+S.RD.length+')</button>'+
+    '<button class="btn btn-red" id="btn-clear-ed">&#128465; ยาใกล้หมดอายุ ('+S.ED.length+')</button>'+
+    '<button class="btn btn-red" id="btn-clear-xd">&#128465; Dead Stock ('+S.XD.length+')</button>'+
+    '<button class="btn btn-red" id="btn-clear-recv">&#128465; ยารับเข้า ('+S.RECV.length+')</button>'+
+    '<button class="btn btn-red" id="btn-clear-levels">&#128465; Drug Levels ('+Object.keys(S.drugLevels).length+')</button>'+
+    '<button class="btn" style="border-color:#991b1b;color:#991b1b;font-weight:bold" id="btn-clear-all">&#9888; ลบทุกส่วน</button>'+
+  '</div></div>':'');
+}
+
+/* ==================== MODALS ==================== */
+function modalH(){
+  if(S.modal==='reorder-act')   return reorderActH();
+  if(S.modal==='edit-drug')     return editDrugH();
+  if(S.modal==='exp-act')       return expActH();
+  if(S.modal==='steps')         return stepsViewH();
+  if(S.modal==='add-recv'||S.modal==='edit-recv') return recvModalH();
+  if(S.modal==='add-user')      return addUserH();
+  if(S.modal==='edit-user')     return editUserH();
+  if(S.modal==='report-preview') return reportPreviewH();
+  return '';
+}
+
+function reorderActH(){
+  var drug=findById(S.RD,S.md.id);if(!drug)return '';
+  var sel=S.md.sel!==undefined?S.md.sel:(drug.action||'');
+  var extra='';
+  if(sel==='nobuy'||sel==='other') extra='<div class="fg" style="margin-top:10px"><label class="fl">'+(sel==='nobuy'?'เหตุผลที่ไม่ซื้อ':'รายละเอียด')+'</label><textarea class="fi" id="mreason">'+(S.md.reason!==undefined?S.md.reason:(drug.reason||''))+'</textarea></div>';
+  if(sel==='borrow') extra+=stepsH2(BORROW,S.md.bs!==undefined?S.md.bs:(drug.borrowStep||0),S.md.sd||drug.stepData||{},'bst','bsf');
+  return mwrap('<div class="mtitle">&#128196; การดำเนินการ: '+drug.name+'</div>'+
+    '<div class="fg"><label class="fl">เลือก</label><div class="tag-row">'+['order01','order02','order03','po','special','nobuy','borrow','other'].map(function(a){return '<button class="btn btn-sm'+(sel===a?' btn-blue':'')+'" data-sr="'+a+'">'+ACT_LBL[a]+'</button>';}).join('')+'</div></div>'+
+    extra+'<div class="mfooter"><button class="btn" id="mcancel">ยกเลิก</button>'+(sel?'<button class="btn btn-blue" id="msaver">&#128190; บันทึก</button>':'')+'</div>');
+}
+function editDrugH(){
+  var d=S.md.drug;if(!d)return '';var lt=S.md.lt;
+  var stOpts=['reorder','min','empty'].map(function(s){return '<option value="'+s+'"'+(d.status===s?' selected':'')+'>'+ST_LBL[s]+'</option>';}).join('');
+  return mwrap('<div class="mtitle">&#9998; แก้ไขข้อมูลยา</div>'+
+    '<div class="grow2">'+
+      '<div class="fg"><label class="fl">รหัสยา</label><input class="fi" id="ed-id" value="'+d.id+'" maxlength="7"></div>'+
+      '<div class="fg"><label class="fl">ชื่อยา</label><input class="fi" id="ed-name" value="'+d.name+'"></div>'+
+      '<div class="fg"><label class="fl">จำนวนคงเหลือ</label><input class="fi" type="number" id="ed-qty" value="'+d.qty+'"></div>'+
+      (lt==='reorder'?'<div class="fg"><label class="fl">สถานะสต๊อก</label><select class="fi" id="ed-status">'+stOpts+'</select></div>':'<div class="fg"><label class="fl">วันหมดอายุ</label><input class="fi" type="date" id="ed-exp" value="'+(d.expDate||'')+'"></div>')+
+    '</div>'+
+    (lt==='reorder'?'<div class="grow3"><div class="fg"><label class="fl">Max</label><input class="fi" type="number" id="ed-max" value="'+d.max+'"></div><div class="fg"><label class="fl">Reorder Point</label><input class="fi" type="number" id="ed-ro" value="'+d.reorder+'"></div><div class="fg"><label class="fl">Min</label><input class="fi" type="number" id="ed-min" value="'+d.min+'"></div></div>':'')+
+    '<div class="mfooter"><button class="btn" id="mcancel">ยกเลิก</button><button class="btn btn-blue" id="msave-drug">&#128190; บันทึก</button></div>');
+}
+function expActH(){
+  var lt=S.md.lt,list=lt==='nearexp'?S.ED:S.XD;
+  var drug=findById(list,S.md.id);if(!drug)return '';
+  var sel=S.md.sel||'';
+  var hs=sel==='exchange_hospital'||sel==='exchange_company'||sel==='borrow';
+  var steps=sel==='borrow'?BORROW:EXCHANGE;
+  var extra='';
+  if(sel==='other') extra='<div class="fg" style="margin-top:8px"><label class="fl">รายละเอียด</label><textarea class="fi" id="menote">'+(S.md.note||'')+'</textarea></div>';
+  if(hs) extra+='<div class="fg" style="margin-top:8px"><label class="fl">'+(sel==='borrow'?'ขั้นตอนยืมยา':'ขั้นตอนแลกเปลี่ยน')+'</label>'+stepsH2(steps,S.md.es||0,S.md.sd||{},'est','esf')+'</div>';
+  return mwrap('<div class="mtitle">+ เพิ่มการดำเนินการ: '+drug.name+'</div>'+
+    '<div class="fg"><label class="fl">เลือก</label><div class="tag-row">'+EXP_ACTIONS.map(function(a){return '<button class="btn btn-sm'+(sel===a.id?' btn-blue':'')+'" data-se="'+a.id+'">'+a.label+'</button>';}).join('')+'</div></div>'+
+    (sel?'<div class="grow2" style="margin-top:10px"><div class="fg"><label class="fl">ผู้รับผิดชอบ</label><input class="fi" id="mresp" value="'+(S.md.responsible||'')+'"></div><div class="fg"><label class="fl">วันที่ดำเนินการ</label><input class="fi" type="date" id="mdate" value="'+(S.md.actionDate||'')+'"></div></div>':'')+
+    extra+'<div class="mfooter"><button class="btn" id="mcancel">ยกเลิก</button>'+(sel?'<button class="btn btn-blue" id="msavee">&#128190; บันทึก</button>':'')+'</div>');
+}
+function stepsViewH(){
+  var lt=S.md.lt,list=lt==='reorder'?S.RD:lt==='nearexp'?S.ED:S.XD;
+  var drug=findById(list,S.md.id);if(!drug)return '';
+  var cur,sd,def;
+  if(lt==='reorder'){cur=drug.borrowStep||0;sd=drug.stepData||{};def=BORROW;}
+  else{var act=drug.actions.find(function(a){return a.id===S.md.aid;});if(!act)return mwrap('<div class="mtitle">ไม่พบ</div><div class="mfooter"><button class="btn" id="mcancel">ปิด</button></div>');cur=act.exchangeStep||0;sd=act.stepData||{};def=act.actId==='borrow'?BORROW:EXCHANGE;}
+  var h='<div class="mtitle">&#128269; ขั้นตอน: '+drug.name+'</div><div class="step-list">';
+  for(var i=0;i<def.length;i++){var s=def[i],done=cur>=s.num;h+='<div class="si'+(done?' done':'')+'"><div class="sh"><div class="sn'+(done?' done':'')+'">'+(done?'&#10003;':s.num)+'</div><span style="font-weight:'+(done?'bold':'normal')+'">'+s.label+'</span></div>';if(done&&s.fields.length){h+='<div style="font-size:12px;color:#444;margin-top:6px;padding-left:32px">';for(var j=0;j<s.fields.length;j++){var f=s.fields[j];if(sd[f.id])h+='<span style="margin-right:10px">'+f.label+': <b>'+sd[f.id]+'</b></span>';}h+='</div>';}h+='</div>';}
+  return mwrap(h+'</div><div class="mfooter"><button class="btn" id="mcancel">ปิด</button></div>');
+}
+function recvModalH(){
+  var rv=S.md,isEdit=S.modal==='edit-recv';
+  var recvSel=rv.received;
+  var reasonOpts=RECV_REASONS.map(function(r){return '<option value="'+r+'"'+(rv.notReceivedReason===r?' selected':'')+'>'+r+'</option>';}).join('');
+  return mwrap('<div class="mtitle">&#128666; '+(isEdit?'แก้ไข':'เพิ่ม')+'รายการยารับเข้า</div>'+
+    '<div class="grow2">'+
+      '<div class="fg"><label class="fl">วันที่ยามาถึง รพ.</label><input class="fi" type="date" id="rv-date" value="'+(rv.arrivalDate||'')+'"></div>'+
+      '<div class="fg"><label class="fl">รหัสยา (ไม่บังคับ)</label><input class="fi" id="rv-id" value="'+(rv.drugId||'')+'" maxlength="7"></div>'+
+      '<div class="fg"><label class="fl">ชื่อยา</label><input class="fi" id="rv-name" value="'+(rv.drugName||'')+'"></div>'+
+      '<div class="fg"><label class="fl">Lot Number</label><input class="fi" id="rv-lot" value="'+(rv.lot||'')+'"></div>'+
+      '<div class="fg"><label class="fl">จำนวน</label><input class="fi" type="number" id="rv-qty" value="'+(rv.qty||0)+'"></div>'+
+    '</div>'+
+    '<div class="fg"><label class="fl">สถานะการรับเข้า</label>'+
+      '<div class="tag-row" style="margin-top:6px">'+
+        '<button class="btn btn-sm'+(recvSel===true?' btn-green':'')+'" id="rv-yes">&#10003; รับเข้าแล้ว</button>'+
+        '<button class="btn btn-sm'+(recvSel===false?' btn-orange':'')+'" id="rv-no">&#9888; ยังไม่รับเข้า</button>'+
+      '</div>'+
+    '</div>'+
+    (recvSel===false?'<div class="fg"><label class="fl">เหตุผลที่ยังไม่รับเข้า</label><select class="fi" id="rv-reason">'+reasonOpts+'</select></div>'+(rv.notReceivedReason==='อื่นๆ'?'<div class="fg"><label class="fl">รายละเอียด</label><input class="fi" id="rv-other" value="'+(rv.notReceivedOther||'')+'"></div>':''):'')+
+    '<div id="rverr" class="err"></div>'+
+    '<div class="mfooter"><button class="btn" id="mcancel">ยกเลิก</button><button class="btn btn-blue" id="msave-rv">&#128190; บันทึก</button></div>');
+}
+function addUserH(){return mwrap('<div class="mtitle">+ เพิ่มผู้ใช้</div>'+userFormH('nu',{})+'<div class="mfooter"><button class="btn" id="mcancel">ยกเลิก</button><button class="btn btn-blue" id="msave-user">บันทึก</button></div>');}
+function editUserH(){return mwrap('<div class="mtitle">&#9998; แก้ไขผู้ใช้</div>'+userFormH('eu',S.md)+'<div class="mfooter"><button class="btn" id="mcancel">ยกเลิก</button><button class="btn btn-blue" id="msave-eu">บันทึก</button></div>');}
+function userFormH(p,d){return '<div class="grow2"><div class="fg"><label class="fl">ชื่อ-นามสกุล</label><input class="fi" id="'+p+'-name" value="'+(d.name||'')+'"></div><div class="fg"><label class="fl">Username</label><input class="fi" id="'+p+'-uname" value="'+(d.username||'')+'"></div><div class="fg"><label class="fl">'+(p==='eu'?'รหัสผ่านใหม่ (เว้นว่าง=ไม่เปลี่ยน)':'รหัสผ่าน')+'</label><input class="fi" type="password" id="'+p+'-pass"></div><div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="'+p+'-email" value="'+(d.email||'')+'"></div></div><div class="fg"><label class="fl">สิทธิ์</label><select class="fi" id="'+p+'-role">'+['admin','pharmacist','viewer'].map(function(r){return '<option value="'+r+'"'+(d.role===r?' selected':'')+'>'+ROLE_LBL[r]+'</option>';}).join('')+'</select></div><div id="uerr" class="err"></div>';}
+
+function reportPreviewH(){
+  var date=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  var chans=S.notifyEmails.join(', ')+(S.notifyLines.length?' | LINE: '+S.notifyLines.length+' token':'');
+  return '<div class="modal-bg"><div class="modal modal-wide"><div class="mtitle">&#128276; Daily Report — '+date+'</div>'+(chans?'<div class="ab ab-blue" style="font-size:12px;margin-bottom:10px">จะส่งไปที่: <b>'+chans+'</b></div>':'<div class="ab ab-red" style="margin-bottom:10px;font-size:12px">&#9888; ยังไม่ตั้งค่าช่องทางแจ้งเตือน</div>')+buildReportHTML(false)+'<div class="mfooter"><button class="btn" id="mcancel">ปิด</button><button class="btn btn-blue" id="btn-print-report">&#128438; Export PDF</button></div></div></div>';
+}
+
+function mwrap(inner){return '<div class="modal-bg"><div class="modal">'+inner+'</div></div>';}
+
+function stepsH2(steps,cur,sd,sa,fp){
+  var h='<div class="step-list">';
+  for(var i=0;i<steps.length;i++){
+    var s=steps[i],done=cur>=s.num,canDo=cur+1===s.num;
+    h+='<div class="si'+(done?' done':'')+'"><div class="sh"><div class="sn'+(done?' done':'')+'">'+(done?'&#10003;':s.num)+'</div><span style="font-weight:'+(done?'bold':'normal')+'">'+s.label+'</span>'+(canDo?'<button class="btn btn-xs btn-green" data-'+sa+'="'+s.num+'" style="margin-left:auto">&#10004; ดำเนินการแล้ว</button>':'')+'</div>';
+    if((done||canDo)&&s.fields.length){h+='<div class="sfields">';for(var j=0;j<s.fields.length;j++){var f=s.fields[j];h+='<div class="srow"><label>'+f.label+'</label><input type="'+(f.type||'text')+'" id="'+fp+'-'+f.id+'" placeholder="'+(f.ph||'')+'" value="'+(sd[f.id]||'')+'"></div>';}h+='</div>';}
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+
+/* ── BIND MODAL ── */
+function bindModal(){
+  xb('mcancel',function(){S.modal=null;S.md={};render();});
+  document.querySelectorAll('[data-sr]').forEach(function(b){b.onclick=function(){syncM();S.md.sel=b.dataset.sr;render();};});
+  document.querySelectorAll('[data-bst]').forEach(function(b){b.onclick=function(){syncM();S.md.bs=parseInt(b.dataset.bst);render();};});
+  xb('msaver',function(){syncM();var drug=findById(S.RD,S.md.id);if(!drug)return;drug.action=S.md.sel;drug.reason=S.md.reason||'';drug.borrowStep=S.md.bs||0;drug.stepData=S.md.sd||{};S.modal=null;S.md={};render();});
+  xb('msave-drug',function(){
+    var lt=S.md.lt,list=lt==='reorder'?S.RD:lt==='nearexp'?S.ED:S.XD;
+    for(var i=0;i<list.length;i++){
+      if(list[i].id===S.md.drug.id){
+        list[i].id=g('ed-id')||list[i].id;list[i].name=g('ed-name')||list[i].name;list[i].qty=parseInt(document.getElementById('ed-qty').value)||0;
+        if(lt==='reorder'){list[i].status=g('ed-status');list[i].max=parseInt(document.getElementById('ed-max').value)||0;list[i].reorder=parseInt(document.getElementById('ed-ro').value)||0;list[i].min=parseInt(document.getElementById('ed-min').value)||0;}
+        else list[i].expDate=g('ed-exp');
+        break;
+      }
+    }
+    S.modal=null;S.md={};render();
+  });
+  document.querySelectorAll('[data-se]').forEach(function(b){b.onclick=function(){syncM();S.md.sel=b.dataset.se;render();};});
+  document.querySelectorAll('[data-est]').forEach(function(b){b.onclick=function(){syncM();S.md.es=parseInt(b.dataset.est);render();};});
+  xb('msavee',function(){syncM();var list=S.md.lt==='nearexp'?S.ED:S.XD;var drug=findById(list,S.md.id);if(!drug)return;var a=makeAction(S.md.sel);a.responsible=S.md.responsible||'';a.actionDate=S.md.actionDate||'';a.note=S.md.note||'';a.exchangeStep=S.md.es||0;a.stepData=S.md.sd||{};drug.actions.push(a);S.modal=null;S.md={};render();});
+  xb('rv-yes',function(){syncRv();S.md.received=true;render();});
+  xb('rv-no',function(){syncRv();S.md.received=false;render();});
+  var rr=document.getElementById('rv-reason');if(rr)rr.onchange=function(){syncRv();if(this.value==='อื่นๆ')render();};
+  document.querySelectorAll('[data-toggle-rpt]').forEach(function(b){b.onclick=function(){var body=document.getElementById('rsb-'+b.dataset.toggleRpt);if(body){body.classList.toggle('open');var a=b.querySelector('.rptarrow');if(a)a.innerHTML=body.classList.contains('open')?'&#9650;':'&#9660;';}};});
+  xb('btn-print-report',function(){var prev=S.modal;S.modal=null;render();setTimeout(function(){document.title='Daily Report '+new Date().toLocaleDateString('th-TH');window.print();document.title='ระบบจัดการยา';S.modal=prev;render();},300);});
+  xb('msave-rv',function(){
+    syncRv();var err=document.getElementById('rverr');
+    if(S.md.received===null){err.textContent='กรุณาเลือกสถานะ';return;}
+    if(S.md.received===false&&!S.md.notReceivedReason){err.textContent='กรุณาระบุเหตุผล';return;}
+    if(S.modal==='edit-recv'){for(var i=0;i<S.RECV.length;i++){if(S.RECV[i].id===S.md.id){S.RECV[i]=JSON.parse(JSON.stringify(S.md));break;}}}
+    else S.RECV.push(makeRecv(S.md));
+    S.modal=null;S.md={};render();
+  });
+  xb('msave-user',function(){var name=g('nu-name'),uname=g('nu-uname'),pass=g('nu-pass'),email=g('nu-email'),role=g('nu-role');var err=document.getElementById('uerr');if(!name||!uname||!pass){err.textContent='กรุณากรอกชื่อ, username และรหัสผ่าน';return;}if(S.users.find(function(u){return u.username===uname;})){err.textContent='Username ถูกใช้แล้ว';return;}S.users.push({id:uid(),username:uname,password:pass,role:role,name:name,email:email});S.modal=null;S.md={};render();});
+  xb('msave-eu',function(){var name=g('eu-name'),uname=g('eu-uname'),pass=g('eu-pass'),email=g('eu-email'),role=g('eu-role');var err=document.getElementById('uerr');if(!name||!uname){err.textContent='กรุณากรอกชื่อและ username';return;}if(S.users.find(function(u){return u.username===uname&&u.id!==S.md.uid;})){err.textContent='Username ถูกใช้แล้ว';return;}for(var i=0;i<S.users.length;i++){if(S.users[i].id===S.md.uid){S.users[i].name=name;S.users[i].username=uname;S.users[i].email=email;S.users[i].role=role;if(pass)S.users[i].password=pass;if(S.user.id===S.md.uid)S.user=S.users[i];break;}}S.modal=null;S.md={};render();});
+  /* report preview section toggles */
+  document.querySelectorAll('[data-toggle-section]').forEach(function(b){b.onclick=function(){var body=document.getElementById('rsb-'+b.dataset.toggleSection);if(body){body.classList.toggle('open');var a=b.querySelector('.rsc-arrow');if(a)a.innerHTML=body.classList.contains('open')?'&#9650;':'&#9660;';}};});
+}
+
+function g(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+function syncM(){function v(id){var el=document.getElementById(id);return el?el.value:undefined;}var r=v('mreason');if(r!==undefined)S.md.reason=r;var rp=v('mresp');if(rp!==undefined)S.md.responsible=rp;var dt=v('mdate');if(dt!==undefined)S.md.actionDate=dt;var en=v('menote');if(en!==undefined)S.md.note=en;var sd=S.md.sd||{};document.querySelectorAll('[id^="bsf-"],[id^="esf-"]').forEach(function(inp){sd[inp.id.replace('bsf-','').replace('esf-','')]=inp.value;});S.md.sd=sd;}
+function syncRv(){function v(id){var el=document.getElementById(id);return el?el.value:undefined;}var d=v('rv-date');if(d!==undefined)S.md.arrivalDate=d;var i=v('rv-id');if(i!==undefined)S.md.drugId=i;var n=v('rv-name');if(n!==undefined)S.md.drugName=n;var l=v('rv-lot');if(l!==undefined)S.md.lot=l;var q=v('rv-qty');if(q!==undefined)S.md.qty=parseInt(q)||0;var rs=v('rv-reason');if(rs!==undefined)S.md.notReceivedReason=rs;var ro=v('rv-other');if(ro!==undefined)S.md.notReceivedOther=ro;}
+
+/* ===================== CSV & UTILS ===================== */
+function findById(arr,id){for(var i=0;i<arr.length;i++){if(arr[i].id===id)return arr[i];}return null;}
+function doExportCSV(data,fn){if(!data.length){alert('ไม่มีข้อมูล');return;}var skip=['stepData','actions'];var keys=Object.keys(data[0]).filter(function(k){return !skip.includes(k)&&typeof data[0][k]!=='object';});var csv=[keys.join(',')].concat(data.map(function(r){return keys.map(function(k){return '"'+(r[k]!=null?r[k]:'')+'\"';}).join(',');})).join('\n');dl('data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv),fn);}
+
+function handleCSV(e,type){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var lines=ev.target.result.trim().split('\n');
+    if(lines.length<2){alert('ไฟล์ไม่มีข้อมูล');return;}
+    var headers=lines[0].split(',').map(function(h){return h.trim().replace(/^"|"$/g,'');});
+    var rows=[];
+    for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var vals=lines[i].split(',').map(function(v){return v.trim().replace(/^"|"$/g,'');});var o={};for(var j=0;j<headers.length;j++)o[headers[j]]=vals[j]||'';rows.push(o);}
+    var cnt=0;
+    if(type==='reorder'){rows.forEach(function(o){
+      var id=(o['รหัสยา']||o['drug_id']||'').trim();if(!id)return;
+      var lv=S.drugLevels[id]||null;
+      var maxVal=lv?lv.max:(parseInt(o['max'])||0);
+      var roVal=lv?lv.reorder:(parseInt(o['reorder_point']||o['reorder'])||0);
+      var minVal=lv?lv.min:(parseInt(o['min'])||0);
+      var ex=findById(S.RD,id);
+      if(ex){ex.name=o['ชื่อยา']||o['name']||ex.name;ex.qty=ii(o['จำนวน']||o['qty'],ex.qty);ex.max=maxVal;ex.reorder=roVal;ex.min=minVal;if(o['status'])ex.status=o['status'];}
+      else S.RD.push(makeDrug({id:id,name:o['ชื่อยา']||o['name']||'',qty:parseInt(o['จำนวน']||o['qty'])||0,max:maxVal,reorder:roVal,min:minVal,status:o['status']||'reorder'}));
+      cnt++;
+    });}
+    else if(type==='levels'){rows.forEach(function(o){var id=(o['รหัสยา']||o['drug_id']||'').trim();if(!id)return;S.drugLevels[id]={name:o['ชื่อยา']||o['name']||'',max:parseInt(o['max'])||0,reorder:parseInt(o['reorder_point']||o['reorder'])||0,min:parseInt(o['min'])||0};var d=findById(S.RD,id);if(d){d.max=S.drugLevels[id].max;d.reorder=S.drugLevels[id].reorder;d.min=S.drugLevels[id].min;}cnt++;});}
+    else if(type==='receive'){rows.forEach(function(o){S.RECV.push(makeRecv({id:uid(),arrivalDate:o['วันที่ยามาถึง']||o['arrival_date']||'',drugId:'',drugName:o['ชื่อยา']||o['name']||'',lot:o['lot']||o['Lot']||'',qty:parseInt(o['จำนวน']||o['qty'])||0,received:null,notReceivedReason:'',notReceivedOther:''}));cnt++;});}
+    else{var arr=type==='nearexp'?S.ED:S.XD;rows.forEach(function(o){var id=(o['รหัสยา']||o['drug_id']||'').trim();if(!id)return;var ex=findById(arr,id);if(ex){ex.name=o['ชื่อยา']||o['name']||ex.name;ex.qty=ii(o['จำนวน']||o['qty'],ex.qty);ex.expDate=o['วันหมดอายุ']||o['exp_date']||ex.expDate;}else arr.push(makeDrug({id:id,name:o['ชื่อยา']||o['name']||'',qty:parseInt(o['จำนวน']||o['qty'])||0,expDate:o['วันหมดอายุ']||o['exp_date']||''}));cnt++;});}
+    /* check dups after import */
+    var dups=getDupWarnings();var dupIds=Object.keys(dups);
+    var msg='อัพเดทข้อมูล '+cnt+' รายการแล้ว';
+    if(dupIds.length) msg+='\n\n⚠️ พบชื่อยาคล้ายกัน '+dupIds.length+' รายการ — กรุณาตรวจสอบ';
+    alert(msg);e.target.value='';render();
+  };
+  reader.readAsText(file,'utf-8');
+}
+function ii(v,fb){var n=parseInt(v);return isNaN(n)?fb:n;}
+
+function downloadTemplate(type){
+  var csv='';
+  if(type==='reorder')   csv='รหัสยา,ชื่อยา,จำนวน,status\n1000011,ยาตัวอย่าง A,100,reorder\n1000012,ยาตัวอย่าง B,0,empty\n// หมายเหตุ: max, reorder_point, min จะดึงจาก Drug Levels อัตโนมัติตามรหัสยา';
+  else if(type==='levels') csv='รหัสยา,ชื่อยา,max,reorder_point,min\n1000001,Paracetamol 500 mg,2000,300,150\n1000002,Amoxicillin 500 mg,800,200,80';
+  else if(type==='nearexp') csv='รหัสยา,ชื่อยา,จำนวน,วันหมดอายุ\n2000009,ยาตัวอย่าง C,48,2025-06-30';
+  else if(type==='deadstock') csv='รหัสยา,ชื่อยา,จำนวน,วันหมดอายุ\n3000007,ยาตัวอย่าง D,200,2026-03-01';
+  else if(type==='receive') csv='วันที่ยามาถึง,ชื่อยา,lot,จำนวน\n2025-04-10,Paracetamol 500 mg,LOT2501A,200\n2025-04-10,Amoxicillin 500 mg,LOT2502B,100';
+  dl('data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv),'template_'+type+'.csv');
+}
+
+function dl(href,fn){var a=document.createElement('a');a.href=href;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+function doPDF(section){
+  var prev=S.tab;S.tab=section;S.modal=null;render();
+  var titles={dashboard:'ภาพรวม',reorder:'Reorder/Min/หมดคลัง',nearexp:'ยาใกล้หมดอายุ',deadstock:'Dead Stock',receive:'ยารับเข้า'};
+  setTimeout(function(){document.title=titles[section]||'รายงาน';window.print();document.title='ระบบจัดการยา';S.tab=prev;render();},300);
+}
+
+/* ===================== GOOGLE APPS SCRIPT WEB APP ===================== */
+/*
+  วิธีสร้าง Apps Script Web App:
+  1. เปิด Google Sheet → Extensions → Apps Script
+  2. วาง code ด้านล่าง → บันทึก → Deploy → New deployment
+     Type: Web app | Execute as: Me | Who has access: Anyone
+  3. Copy Web App URL มาวางในหน้าตั้งค่า
+*/
+
+/* ---- READ from GAS ---- */
+/* ---- TEST connection ---- */
+function gasTest(type){
+  var url=S.gasUrls[type];
+  if(!url){
+    var el=document.getElementById('gsync-status-'+type);
+    if(el) el.innerHTML='<span style="color:#aaa">กรุณาใส่ URL ก่อน</span>';
+    return;
+  }
+  var el=document.getElementById('gsync-status-'+type);
+  if(el){el.innerHTML='<span style="color:#888">&#9203; กำลังทดสอบ...</span>';}
+  var sep=url.indexOf('?')>=0?'&':'?';
+  var req=url+sep+'sheet='+encodeURIComponent(type)+'&t='+Date.now();
+  fetch(req,{redirect:'follow'})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status+' — ตรวจสอบ URL และ Deploy setting');
+      return r.text();
+    })
+    .then(function(raw){
+      var data;
+      try{ data=JSON.parse(raw); }
+      catch(pe){
+        /* แสดง raw response เพื่อ debug */
+        if(el) el.innerHTML='<span style="color:#991b1b">&#10007; Response ไม่ใช่ JSON</span>'+
+          '<br><details style="font-size:11px;margin-top:4px"><summary style="cursor:pointer;color:#1a56db">ดู raw response (คลิก)</summary>'+
+          '<pre style="background:#f8f8f6;padding:6px;border-radius:4px;overflow:auto;max-height:100px;font-size:10px">'+raw.slice(0,500)+'</pre>'+
+          '<b style="color:#991b1b">วิธีแก้:</b> URL นี้อาจเป็น Google Sheet URL ธรรมดา — ต้องใช้ <b>Web App URL</b> จาก Deploy เท่านั้น'+
+          '</details>';
+        return;
+      }
+      if(data.error){
+        if(el) el.innerHTML='<span style="color:#991b1b">&#10007; Apps Script error: '+data.error+'</span>';
+        return;
+      }
+      var rows=data.rows||[];
+      var msg='&#10003; <b>เชื่อมต่อสำเร็จ</b> — พบ <b>'+rows.length+' แถว</b> ใน Sheet';
+      if(rows.length===0) msg+=' (Sheet ว่าง หรือยังไม่มีข้อมูล)';
+      if(el) el.innerHTML='<span style="color:#166534">'+msg+'</span>';
+    })
+    .catch(function(e){
+      var hint='';
+      if(e.message.indexOf('Failed to fetch')>=0||e.message.indexOf('NetworkError')>=0||e.message.indexOf('CORS')>=0){
+        hint='<br><b>วิธีแก้ปัญหา CORS:</b>'+
+          '<br>&#9312; ไปที่ Apps Script → <b>Deploy → Manage deployments</b>'+
+          '<br>&#9313; กด Edit (ไอคอนดินสอ) → เปลี่ยน <b>Who has access → Anyone</b>'+
+          '<br>&#9314; กด <b>Deploy</b> → Copy URL ใหม่มาวาง (URL เปลี่ยนทุกครั้งที่ Deploy ใหม่)'+
+          '<br>&#9315; ตรวจสอบว่า URL ขึ้นต้นด้วย <code>https://script.google.com/macros/s/</code>';
+      }
+      if(el) el.innerHTML='<span style="color:#991b1b">&#10007; '+e.message+'</span>'+hint;
+    });
+}
+
+/* ---- READ from GAS ---- */
+function gasRead(type,callback){
+  var url=S.gasUrls[type];
+  if(!url){alert('กรุณาตั้งค่า Web App URL สำหรับ "'+type+'" ในหน้าตั้งค่าก่อน');S.tab='settings';render();return;}
+  var el=document.getElementById('gsync-status-'+type);
+  if(el){el.innerHTML='<span style="color:#888">&#9203; กำลังโหลด...</span>';}
+  var sep=url.indexOf('?')>=0?'&':'?';
+  var req=url+sep+'sheet='+encodeURIComponent(type)+'&t='+Date.now();
+  fetch(req,{redirect:'follow'})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status+' — ตรวจสอบ Deploy setting');
+      return r.text(); /* ใช้ text ก่อน เผื่อ response ไม่ใช่ JSON */
+    })
+    .then(function(raw){
+      var data;
+      try{ data=JSON.parse(raw); }
+      catch(pe){
+        /* อาจได้ HTML redirect หรือ error page */
+        throw new Error('Response ไม่ใช่ JSON — ได้รับ: '+raw.slice(0,80));
+      }
+      if(data.error) throw new Error('Apps Script error: '+data.error);
+      var rows=data.rows||[];
+      var cnt=importRows(type,rows);
+      if(el){el.innerHTML='<span style="color:#166534">&#10003; โหลด <b>'+rows.length+'</b> แถว, อัพเดท <b>'+cnt+'</b> รายการ</span>';}
+      render();
+      if(callback) callback(cnt);
+    })
+    .catch(function(e){
+      var hint='';
+      if(e.message.indexOf('Failed to fetch')>=0||e.message.indexOf('NetworkError')>=0||e.message.indexOf('CORS')>=0){
+        hint='<br><b>สาเหตุที่พบบ่อย:</b>'+
+          '<br>• Deploy ต้องเลือก <b>Who has access: Anyone</b> (ไม่ใช่ "Anyone with Google account")'+
+          '<br>• ต้อง Deploy ใหม่ทุกครั้งที่แก้ code (Manage deployments → Edit → Version: New)'+
+          '<br>• ใช้ URL ที่ขึ้นต้นด้วย <b>https://script.google.com/macros/s/.../exec</b> เท่านั้น';
+      }
+      if(el){el.innerHTML='<span style="color:#991b1b">&#10007; โหลดไม่สำเร็จ: '+e.message+'</span>'+hint;}
+      console.error('gasRead error:',e);
+    });
+}
+
+/* ---- WRITE to GAS ---- */
+function gasWrite(type,rows,callback){
+  var url=S.gasUrls[type];
+  if(!url){alert('กรุณาตั้งค่า Web App URL สำหรับ "'+type+'" ในหน้าตั้งค่าก่อน');return;}
+  var el=document.getElementById('gsync-status-'+type);
+  if(el){el.innerHTML='<span style="color:#888">&#9203; กำลังบันทึก...</span>';}
+  fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain'}, /* text/plain เพื่อหลีก CORS preflight */
+    body:JSON.stringify({sheet:type,rows:rows})
+  })
+    .then(function(r){return r.text();})
+    .then(function(raw){
+      var data;
+      try{data=JSON.parse(raw);}catch(e){throw new Error('Response ไม่ใช่ JSON: '+raw.slice(0,80));}
+      if(data.error) throw new Error(data.error);
+      if(el){el.innerHTML='<span style="color:#166534">&#10003; บันทึก <b>'+data.written+'</b> แถว ไปยัง Sheet แล้ว</span>';}
+      if(callback) callback();
+    })
+    .catch(function(e){
+      if(el){el.innerHTML='<span style="color:#991b1b">&#10007; บันทึกไม่สำเร็จ: '+e.message+'</span>';}
+      alert('บันทึกไม่สำเร็จ: '+e.message);
+    });
+}
+
+/* ---- parse rows into app data ---- */
+function importRows(type,rows){
+  var cnt=0;
+  if(type==='reorder'){
+    rows.forEach(function(o){
+      var id=(o['รหัสยา']||o['drug_id']||'').trim();if(!id)return;
+      /* ดึง max/reorder/min จาก drugLevels ถ้ามี มิฉะนั้นค่อยเอาจาก Sheet */
+      var lv=S.drugLevels[id]||null;
+      var maxVal  = lv ? lv.max     : (parseInt(o['max'])||0);
+      var roVal   = lv ? lv.reorder : (parseInt(o['reorder_point']||o['reorder'])||0);
+      var minVal  = lv ? lv.min     : (parseInt(o['min'])||0);
+      var ex=findById(S.RD,id);
+      if(ex){
+        ex.name=o['ชื่อยา']||o['name']||ex.name;
+        ex.qty=ii(o['จำนวน']||o['qty'],ex.qty);
+        ex.max=maxVal; ex.reorder=roVal; ex.min=minVal;
+        if(o['status']) ex.status=o['status'];
+      } else {
+        S.RD.push(makeDrug({id:id,name:o['ชื่อยา']||o['name']||'',qty:parseInt(o['จำนวน']||o['qty'])||0,max:maxVal,reorder:roVal,min:minVal,status:o['status']||'reorder'}));
+      }
+      cnt++;
+    });
+  } else if(type==='levels'){
+    rows.forEach(function(o){
+      var id=(o['รหัสยา']||o['drug_id']||'').trim();if(!id)return;
+      S.drugLevels[id]={name:o['ชื่อยา']||o['name']||'',max:parseInt(o['max'])||0,reorder:parseInt(o['reorder_point']||o['reorder'])||0,min:parseInt(o['min'])||0};
+      var d=findById(S.RD,id);if(d){d.max=S.drugLevels[id].max;d.reorder=S.drugLevels[id].reorder;d.min=S.drugLevels[id].min;}
+      cnt++;
+    });
+  } else if(type==='receive'){
+    rows.forEach(function(o){
+      S.RECV.push(makeRecv({id:uid(),arrivalDate:o['วันที่ยามาถึง']||o['arrival_date']||'',drugId:'',drugName:o['ชื่อยา']||o['name']||'',lot:o['lot']||o['Lot']||'',qty:parseInt(o['จำนวน']||o['qty'])||0,received:null}));
+      cnt++;
+    });
+  } else {
+    var arr=type==='nearexp'?S.ED:S.XD;
+    rows.forEach(function(o){
+      var id=(o['รหัสยา']||o['drug_id']||'').trim();if(!id)return;
+      var ex=findById(arr,id);
+      if(ex){ex.name=o['ชื่อยา']||o['name']||ex.name;ex.qty=ii(o['จำนวน']||o['qty'],ex.qty);ex.expDate=o['วันหมดอายุ']||o['exp_date']||ex.expDate;}
+      else arr.push(makeDrug({id:id,name:o['ชื่อยา']||o['name']||'',qty:parseInt(o['จำนวน']||o['qty'])||0,expDate:o['วันหมดอายุ']||o['exp_date']||''}));
+      cnt++;
+    });
+  }
+  return cnt;
+}
+
+/* ---- export current data back to Sheet ---- */
+function gasExport(type){
+  var url=S.gasUrls[type];
+  if(!url){alert('กรุณาตั้งค่า Web App URL ก่อน');S.tab='settings';render();return;}
+  var rows=[];
+  if(type==='reorder'){
+    rows=S.RD.map(function(d){return {'รหัสยา':d.id,'ชื่อยา':d.name,'จำนวน':d.qty,'max':d.max,'reorder_point':d.reorder,'min':d.min,'status':d.status,'action':d.action||''};});
+  } else if(type==='levels'){
+    rows=Object.keys(S.drugLevels).map(function(k){var lv=S.drugLevels[k];return {'รหัสยา':k,'ชื่อยา':lv.name||'','max':lv.max,'reorder_point':lv.reorder,'min':lv.min};});
+  } else if(type==='receive'){
+    rows=S.RECV.map(function(r){return {'วันที่ยามาถึง':r.arrivalDate,'ชื่อยา':r.drugName,'lot':r.lot,'จำนวน':r.qty,'received':r.received===true?'รับเข้าแล้ว':r.received===false?'ยังไม่รับเข้า':'รอดำเนินการ','เหตุผล':r.notReceivedReason||''};});
+  } else {
+    var arr=type==='nearexp'?S.ED:S.XD;
+    rows=arr.map(function(d){return {'รหัสยา':d.id,'ชื่อยา':d.name,'จำนวน':d.qty,'วันหมดอายุ':d.expDate,'actions':d.actions.map(function(a){return eal(a.actId)+(a.responsible?' ('+a.responsible+')':'');}).join(', ')};});
+  }
+  if(rows.length===0){alert('ไม่มีข้อมูลให้ส่ง');return;}
+  gasWrite(type,rows,function(){alert('ส่งข้อมูล '+rows.length+' แถว ไปยัง Google Sheet แล้ว');});
+}
+
+render();
+</script>
+</body>
+</html>
